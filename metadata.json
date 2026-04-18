@@ -1,0 +1,6 @@
+{
+  "name": "Spaced Vocab Learner",
+  "description": "A vocabulary learning app leveraging weighted spacing, Levenshtein distances for forgiving typos, and persistent progress tracking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
