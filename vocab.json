@@ -1,0 +1,562 @@
+[
+  {
+    "stt": 1,
+    "word": "passenger",
+    "type": "n",
+    "phonetic": "/'pæsındzə(r)/",
+    "meaning": "hành khách"
+  },
+  {
+    "stt": 2,
+    "word": "responsibility",
+    "type": "n",
+    "phonetic": "/rı, sponsə biləti/",
+    "meaning": "trách nhiệm"
+  },
+  {
+    "stt": 3,
+    "word": "separate",
+    "type": "adj/v",
+    "phonetic": "/'seprǝt/",
+    "meaning": "tách rời, riêng biệt/ tách ra"
+  },
+  {
+    "stt": 4,
+    "word": "willing",
+    "type": "adj",
+    "phonetic": "/'wiln/",
+    "meaning": "sẵn sàng"
+  },
+  {
+    "stt": 5,
+    "word": "assorted",
+    "type": "adj",
+    "phonetic": "/ǝ'sɔ:tıd/",
+    "meaning": "đủ loại"
+  },
+  {
+    "stt": 6,
+    "word": "limited",
+    "type": "adj",
+    "phonetic": "/'lımıtıd/",
+    "meaning": "hạn chế"
+  },
+  {
+    "stt": 7,
+    "word": "prohibit",
+    "type": "v",
+    "phonetic": "/prǝ'hıbıt/",
+    "meaning": "cấm"
+  },
+  {
+    "stt": 8,
+    "word": "authority",
+    "type": "n",
+    "phonetic": "/ɔ: 'θɒrǝti/",
+    "meaning": "quyền lực, thẩm quyền"
+  },
+  {
+    "stt": 9,
+    "word": "transport",
+    "type": "v",
+    "phonetic": "/træn'spo:t/",
+    "meaning": "vận chuyển"
+  },
+  {
+    "stt": 10,
+    "word": "budget",
+    "type": "n",
+    "phonetic": "/'badzit/",
+    "meaning": "ngân sách"
+  },
+  {
+    "stt": 11,
+    "word": "temporarily",
+    "type": "adv",
+    "phonetic": "/'temprǝrǝli/",
+    "meaning": "tạm thời"
+  },
+  {
+    "stt": 12,
+    "word": "competitively",
+    "type": "adv",
+    "phonetic": "/kəm petǝtıvli/",
+    "meaning": "cạnh tranh"
+  },
+  {
+    "stt": 13,
+    "word": "collectively",
+    "type": "adv",
+    "phonetic": "/kə'lektivli/",
+    "meaning": "tập thể"
+  },
+  {
+    "stt": 14,
+    "word": "reinforcement",
+    "type": "n",
+    "phonetic": "/ri:in'fɔ:smənt/",
+    "meaning": "sự củng cố, sự tăng cường"
+  },
+  {
+    "stt": 15,
+    "word": "closely",
+    "type": "adv",
+    "phonetic": "/'klǝusli/",
+    "meaning": "sát sao, chặt chẽ"
+  },
+  {
+    "stt": 16,
+    "word": "account",
+    "type": "n",
+    "phonetic": "/ə'kaunt/",
+    "meaning": "tài khoản"
+  },
+  {
+    "stt": 17,
+    "word": "expect",
+    "type": "v",
+    "phonetic": "/ık'spekt/",
+    "meaning": "mong đợi"
+  },
+  {
+    "stt": 18,
+    "word": "board",
+    "type": "n/v",
+    "phonetic": "/bo:d/",
+    "meaning": "bảng, lên tàu"
+  },
+  {
+    "stt": 19,
+    "word": "in light of something",
+    "type": "idiom",
+    "phonetic": "/in lait 'samθıη/",
+    "meaning": "vì điều gì"
+  },
+  {
+    "stt": 20,
+    "word": "supplemental",
+    "type": "adj",
+    "phonetic": "/saplı'mentl/",
+    "meaning": "bổ sung"
+  },
+  {
+    "stt": 21,
+    "word": "arbitrary",
+    "type": "adj",
+    "phonetic": "/'a:bitrəri/",
+    "meaning": "tùy tiện"
+  },
+  {
+    "stt": 22,
+    "word": "superfluous",
+    "type": "adj",
+    "phonetic": "/su: 'p3:fluǝs/",
+    "meaning": "thừa thãi"
+  },
+  {
+    "stt": 23,
+    "word": "terms",
+    "type": "n",
+    "phonetic": "/t3:mz/",
+    "meaning": "điều khoản"
+  },
+  {
+    "stt": 24,
+    "word": "loan",
+    "type": "n",
+    "phonetic": "/lǝun/",
+    "meaning": "khoản vay"
+  },
+  {
+    "stt": 25,
+    "word": "material",
+    "type": "n",
+    "phonetic": "/mə'tıəriəl/",
+    "meaning": "vật liệu"
+  },
+  {
+    "stt": 26,
+    "word": "host",
+    "type": "n",
+    "phonetic": "/hǝust/",
+    "meaning": "chủ nhà, người tổ chức"
+  },
+  {
+    "stt": 27,
+    "word": "contribute",
+    "type": "v",
+    "phonetic": "/kən'trıbju:t/",
+    "meaning": "đóng góp"
+  },
+  {
+    "stt": 28,
+    "word": "planning",
+    "type": "n",
+    "phonetic": "/'plænın/",
+    "meaning": "sự lên kế hoạch"
+  },
+  {
+    "stt": 29,
+    "word": "proposal",
+    "type": "n",
+    "phonetic": "/prǝ'pǝuzl/",
+    "meaning": "đề xuất"
+  },
+  {
+    "stt": 30,
+    "word": "innovation",
+    "type": "n",
+    "phonetic": "/ınǝ'verfn/",
+    "meaning": "sự đổi mới"
+  },
+  {
+    "stt": 31,
+    "word": "criticism",
+    "type": "n",
+    "phonetic": "/'krıtısızəm/",
+    "meaning": "sự phê bình"
+  },
+  {
+    "stt": 32,
+    "word": "approach",
+    "type": "n/v",
+    "phonetic": "/ə'prǝuts/",
+    "meaning": "phương pháp, tiếp cận"
+  },
+  {
+    "stt": 33,
+    "word": "expire",
+    "type": "v",
+    "phonetic": "/ık'sparǝ(r)/",
+    "meaning": "hết hạn"
+  },
+  {
+    "stt": 34,
+    "word": "renew",
+    "type": "v",
+    "phonetic": "/rı'nju:/",
+    "meaning": "gia hạn"
+  },
+  {
+    "stt": 35,
+    "word": "professional",
+    "type": "adj",
+    "phonetic": "/prǝ' fefǝnl/",
+    "meaning": "chuyên nghiệp"
+  },
+  {
+    "stt": 36,
+    "word": "compose",
+    "type": "v",
+    "phonetic": "/kəm pǝuz/",
+    "meaning": "soạn thảo"
+  },
+  {
+    "stt": 37,
+    "word": "exterior",
+    "type": "n",
+    "phonetic": "/ık'stıəriə(r)/",
+    "meaning": "bên ngoài"
+  },
+  {
+    "stt": 38,
+    "word": "superior",
+    "type": "adj",
+    "phonetic": "/su: 'pıəriə(r)/",
+    "meaning": "cao cấp hơn"
+  },
+  {
+    "stt": 39,
+    "word": "component",
+    "type": "n",
+    "phonetic": "/kəm pəənənt/",
+    "meaning": "thành phần"
+  },
+  {
+    "stt": 40,
+    "word": "loss",
+    "type": "n",
+    "phonetic": "/lps/",
+    "meaning": "sự mất mát"
+  },
+  {
+    "stt": 41,
+    "word": "assemble",
+    "type": "v",
+    "phonetic": "/ǝ'sembl/",
+    "meaning": "lắp ráp"
+  },
+  {
+    "stt": 42,
+    "word": "surface",
+    "type": "n/v",
+    "phonetic": "/'s3:fis/",
+    "meaning": "bề mặt/ lát đường"
+  },
+  {
+    "stt": 43,
+    "word": "obtain",
+    "type": "v",
+    "phonetic": "/ǝb'tein/",
+    "meaning": "đạt được"
+  },
+  {
+    "stt": 44,
+    "word": "reference",
+    "type": "n",
+    "phonetic": "/'refrǝns/",
+    "meaning": "sự tham khảo, thư giới thiệu, chứng thực"
+  },
+  {
+    "stt": 45,
+    "word": "underline",
+    "type": "v",
+    "phonetic": "/ Andə'laım/",
+    "meaning": "gạch dưới"
+  },
+  {
+    "stt": 46,
+    "word": "expansive",
+    "type": "adj",
+    "phonetic": "/ık'spænsıv/",
+    "meaning": "mở rộng"
+  },
+  {
+    "stt": 47,
+    "word": "adjacent",
+    "type": "adj",
+    "phonetic": "/ə'dzeısnt/",
+    "meaning": "liền kề"
+  },
+  {
+    "stt": 48,
+    "word": "renovation",
+    "type": "n",
+    "phonetic": "/, renǝ'verfn/",
+    "meaning": "sự cải tạo"
+  },
+  {
+    "stt": 49,
+    "word": "accommodate",
+    "type": "v",
+    "phonetic": "/ə'kpmədert/",
+    "meaning": "cung cấp chỗ ở"
+  },
+  {
+    "stt": 50,
+    "word": "gathering",
+    "type": "n",
+    "phonetic": "/'gæðəriŋ/",
+    "meaning": "sự tụ họp"
+  },
+  {
+    "stt": 51,
+    "word": "revolutionize",
+    "type": "v",
+    "phonetic": "/revə'lu:fənaız/",
+    "meaning": "cách mạng hóa"
+  },
+  {
+    "stt": 52,
+    "word": "resident",
+    "type": "n",
+    "phonetic": "/rezıdənt/",
+    "meaning": "cư dân"
+  },
+  {
+    "stt": 53,
+    "word": "in advance",
+    "type": "idiom",
+    "phonetic": "/ın ǝd'va:ns/",
+    "meaning": "trước"
+  },
+  {
+    "stt": 54,
+    "word": "reserve",
+    "type": "v",
+    "phonetic": "/ri'z3:V/",
+    "meaning": "đặt trước"
+  },
+  {
+    "stt": 55,
+    "word": "solely",
+    "type": "adv",
+    "phonetic": "/'sǝulli/",
+    "meaning": "chỉ"
+  },
+  {
+    "stt": 56,
+    "word": "fund",
+    "type": "n",
+    "phonetic": "/fand/",
+    "meaning": "quỹ"
+  },
+  {
+    "stt": 57,
+    "word": "organization",
+    "type": "n",
+    "phonetic": "/ɔ:gənaɪ'zeɪʃn/",
+    "meaning": "tổ chức"
+  },
+  {
+    "stt": 58,
+    "word": "field",
+    "type": "n",
+    "phonetic": "/fi:ld/",
+    "meaning": "lĩnh vực"
+  },
+  {
+    "stt": 59,
+    "word": "substantial",
+    "type": "adj",
+    "phonetic": "/sǝb'stænfl/",
+    "meaning": "đáng kể"
+  },
+  {
+    "stt": 60,
+    "word": "harvest",
+    "type": "v/n",
+    "phonetic": "/'ha:vist/",
+    "meaning": "thu hoạch, mùa thu hoạch"
+  },
+  {
+    "stt": 61,
+    "word": "insight",
+    "type": "n",
+    "phonetic": "/'Insait/",
+    "meaning": "sự hiểu biết sâu sắc"
+  },
+  {
+    "stt": 62,
+    "word": "frequently",
+    "type": "adv",
+    "phonetic": "/'fri:kwǝntli/",
+    "meaning": "thường xuyên"
+  },
+  {
+    "stt": 63,
+    "word": "staffing",
+    "type": "n",
+    "phonetic": "/'sta:fin/",
+    "meaning": "sắp xếp, bố trí nhân viên"
+  },
+  {
+    "stt": 64,
+    "word": "outstanding",
+    "type": "adj",
+    "phonetic": "/aut'stændım/",
+    "meaning": "nổi bật"
+  },
+  {
+    "stt": 65,
+    "word": "anticipate",
+    "type": "v",
+    "phonetic": "/æn'tısıpeit/",
+    "meaning": "dự đoán"
+  },
+  {
+    "stt": 66,
+    "word": "expectation",
+    "type": "n",
+    "phonetic": "/ekspek'terfn/",
+    "meaning": "kỳ vọng"
+  },
+  {
+    "stt": 67,
+    "word": "accept",
+    "type": "v",
+    "phonetic": "/ǝk'sept/",
+    "meaning": "chấp nhận"
+  },
+  {
+    "stt": 68,
+    "word": "malfunction",
+    "type": "n",
+    "phonetic": "/mæl'foŋkfn/",
+    "meaning": "sự trục trặc"
+  },
+  {
+    "stt": 69,
+    "word": "cancellation",
+    "type": "n",
+    "phonetic": "/kænsə'leıfn/",
+    "meaning": "sự hủy bỏ"
+  },
+  {
+    "stt": 70,
+    "word": "apology",
+    "type": "n",
+    "phonetic": "/ə'pvlədzi/",
+    "meaning": "lời xin lỗi"
+  },
+  {
+    "stt": 71,
+    "word": "distributor",
+    "type": "n",
+    "phonetic": "/dı'strıbjətə(r)/",
+    "meaning": "nhà phân phối"
+  },
+  {
+    "stt": 72,
+    "word": "enclosed",
+    "type": "adj",
+    "phonetic": "/m'klǝuzd/",
+    "meaning": "đính kèm"
+  },
+  {
+    "stt": 73,
+    "word": "invoice",
+    "type": "n",
+    "phonetic": "/'INVOIS/",
+    "meaning": "hóa đơn"
+  },
+  {
+    "stt": 74,
+    "word": "automatically",
+    "type": "adv",
+    "phonetic": "/ɔ:tə'mætıkli/",
+    "meaning": "tự động"
+  },
+  {
+    "stt": 75,
+    "word": "supply",
+    "type": "n",
+    "phonetic": "/sə'plaı/",
+    "meaning": "nguồn cung cấp"
+  },
+  {
+    "stt": 76,
+    "word": "transition",
+    "type": "n",
+    "phonetic": "/træn'zıfn/",
+    "meaning": "sự chuyển tiếp"
+  },
+  {
+    "stt": 77,
+    "word": "on a regular basis",
+    "type": "collocation",
+    "phonetic": "/vn 'regjələ 'bersis/",
+    "meaning": "đều đặn"
+  },
+  {
+    "stt": 78,
+    "word": "investigate",
+    "type": "v",
+    "phonetic": "/in'vestigeit/",
+    "meaning": "điều tra"
+  },
+  {
+    "stt": 79,
+    "word": "employment",
+    "type": "n",
+    "phonetic": "/ım'pləımənt/",
+    "meaning": "việc làm"
+  },
+  {
+    "stt": 80,
+    "word": "construction",
+    "type": "n",
+    "phonetic": "/kən'strakfn/",
+    "meaning": "sự xây dựng"
+  }
+]
