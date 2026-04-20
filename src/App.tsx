@@ -30,16 +30,7 @@ type DayStats = {
   mastered: number;
 };
 
-const DEFAULT_VOCAB: VocabItem[] = [
-  { stt: 1, word: "abandon", type: "verb", phonetic: "/əˈbæn.dən/", meaning: "từ bỏ", tags: ["general"] },
-  { stt: 2, word: "ability", type: "noun", phonetic: "/əˈbɪl.ə.ti/", meaning: "khả năng", tags: ["general"] },
-  { stt: 3, word: "absence", type: "noun", phonetic: "/ˈæb.səns/", meaning: "sự vắng mặt", tags: ["office"] },
-  { stt: 4, word: "absorb", type: "verb", phonetic: "/əbˈzɔːrb/", meaning: "hấp thụ", tags: ["science"] },
-  { stt: 5, word: "abundance", type: "noun", phonetic: "/əˈbʌn.dəns/", meaning: "sự phong phú", tags: ["general"] },
-  { stt: 6, word: "abuse", type: "verb", phonetic: "/əˈbjuːz/", meaning: "lạm dụng", tags: ["general"] },
-  { stt: 7, word: "academic", type: "adjective", phonetic: "/ˌæk.əˈdem.ɪk/", meaning: "học thuật", tags: ["school"] },
-  { stt: 8, word: "accelerate", type: "verb", phonetic: "/əkˈsel.ə.reɪt/", meaning: "tăng tốc", tags: ["science"] }
-];
+const DEFAULT_VOCAB: VocabItem[] = [];
 
 const getTodayStr = () => {
   const d = new Date();
@@ -551,7 +542,7 @@ export default function App() {
 
                         {/* Diff Visualizer for Failed Typo */}
                         {hasFailedWord && stringDiff && (
-                          <div className="mb-6 max-w-lg mx-auto bg-gray-50 p-5 rounded-2xl border border-gray-100 animate-in fade-in slide-in-from-top-2 text-center text-wrap">
+                          <div className="mb-6 max-w-lg mx-auto bg-gray-50 p-5 BrowserRouternded-2xl border border-gray-100 animate-in fade-in slide-in-from-top-2 text-center text-wrap">
                              <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-3">Compare your mistake</p>
                              <div className="flex flex-wrap gap-[1px] justify-center text-2xl font-mono tracking-widest">
                                {stringDiff.map((part, i) => {
