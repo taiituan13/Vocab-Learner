@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Settings, CheckCircle, XCircle, AlertTriangle, Lightbulb, SearchX, RefreshCcw, BarChart2, BookOpen, Download, Upload, Play, Library, Archive, RotateCcw, Target, Flame, Volume2, ShieldAlert, Trash2, LogOut, Plus } from 'lucide-react';
+import { Settings, CheckCircle, XCircle, AlertTriangle, Lightbulb, SearchX, RefreshCcw, BarChart2, BookOpen, Download, Upload, Play, Library, Archive, RotateCcw, Target, Flame, Volume2, ShieldAlert, Trash2, LogOut, Plus, UserPlus, ChevronDown, Sun, Moon } from 'lucide-react';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, YAxis, CartesianGrid } from 'recharts';
 import { diffChars } from 'diff';
 import { useAuth } from './hooks/useAuth';
@@ -79,13 +79,65 @@ export default function App() {
   const [sessionStats, setSessionStats] = useState({ correct: 0, incorrect: 0, typo: 0, mistakes: {} as Record<number, number> });
   
   const [showSettings, setShowSettings] = useState(false);
+  // UI States
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
   const [jsonInput, setJsonInput] = useState('');
+  const [dataTab, setDataTab] = useState<'single' | 'import' | 'export'>('single');
+
+  // Apply Theme
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [darkMode]);
+  // Management States
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterType, setFilterType] = useState('all');
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [editingWord, setEditingWord] = useState<VocabItem | null>(null);
   
   // New Word Form State
   const [newWord, setNewWord] = useState({ word: '', meaning: '', type: 'noun', phonetic: '', tags: '' });
   
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // CSV Helpers
+  const convertToCSV = (items: VocabItem[]) => {
+    const header = ['STT', 'Word', 'Meaning', 'Type', 'Phonetic', 'Tags'];
+    const rows = items.map(v => [
+      v.stt,
+      `"${v.word.replace(/"/g, '""')}"`,
+      `"${v.meaning.replace(/"/g, '""')}"`,
+      v.type,
+      `"${(v.phonetic || '').replace(/"/g, '""')}"`,
+      `"${(v.tags || []).join(';')}"`
+    ]);
+    return [header.join(','), ...rows.map(r => r.join(','))].join('\n');
+  };
+
+  const parseCSV = (csvText: string): Partial<VocabItem>[] => {
+    const lines = csvText.split('\n').filter(l => l.trim());
+    if (lines.length < 2) return [];
+    
+    // Simple CSV parser (handles basic quoted fields)
+    return lines.slice(1).map(line => {
+      const parts = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
+      const clean = (s: string) => s ? s.replace(/^"|"$/g, '').replace(/""/g, '"').trim() : '';
+      return {
+        word: clean(parts[1]),
+        meaning: clean(parts[2]),
+        type: clean(parts[3]) || 'noun',
+        phonetic: clean(parts[4]),
+        tags: clean(parts[5]) ? clean(parts[5]).split(';') : []
+      };
+    }).filter(v => v.word && v.meaning);
+  };
 
   // Load Data from Firestore
   useEffect(() => {
@@ -327,20 +379,38 @@ export default function App() {
 
   const handleAddWord = async (e: React.FormEvent) => {
     e.preventDefault();
-    const stt = vocab.length > 0 ? Math.max(...vocab.map(v => v.stt)) + 1 : 1;
-    const item: VocabItem = {
-      stt,
-      word: newWord.word.trim(),
-      meaning: newWord.meaning.trim(),
-      type: newWord.type,
-      phonetic: newWord.phonetic.trim(),
-      tags: newWord.tags.split(',').map(t => t.trim()).filter(t => t),
-      archived: false
-    };
-    const newVocab = [...vocab, item];
-    setVocab(newVocab);
-    await syncVocab(newVocab);
+    
+    if (editingWord) {
+      // Update logic
+      const newVocab = vocab.map(v => v.stt === editingWord.stt ? {
+        ...v,
+        word: newWord.word.trim(),
+        meaning: newWord.meaning.trim(),
+        type: newWord.type,
+        phonetic: newWord.phonetic.trim(),
+        tags: newWord.tags.split(',').map(t => t.trim()).filter(t => t)
+      } : v);
+      setVocab(newVocab);
+      await syncVocab(newVocab);
+    } else {
+      // Add logic
+      const stt = vocab.length > 0 ? Math.max(...vocab.map(v => v.stt)) + 1 : 1;
+      const item: VocabItem = {
+        stt,
+        word: newWord.word.trim(),
+        meaning: newWord.meaning.trim(),
+        type: newWord.type,
+        phonetic: newWord.phonetic.trim(),
+        tags: newWord.tags.split(',').map(t => t.trim()).filter(t => t),
+        archived: false
+      };
+      const newVocab = [...vocab, item];
+      setVocab(newVocab);
+      await syncVocab(newVocab);
+    }
+    
     setShowAddModal(false);
+    setEditingWord(null);
     setNewWord({ word: '', meaning: '', type: 'noun', phonetic: '', tags: '' });
   };
 
@@ -378,12 +448,69 @@ export default function App() {
           <button onClick={() => setActiveTab('manage')} className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all ${activeTab === 'manage' ? 'bg-white shadow-sm text-indigo-700' : 'text-gray-500 hover:text-gray-700'}`}><Library className="w-4 h-4" /> Manage</button>
         </div>
         
-        <div className="flex items-center gap-4">
-          <button onClick={() => { setJsonInput(JSON.stringify(vocab, null, 2)); setShowSettings(true); }} className="p-2 text-gray-400 hover:text-indigo-600 transition-colors"><Settings className="w-5 h-5" /></button>
-          <div className="h-8 w-[1px] bg-gray-200"></div>
-          <button onClick={() => signOut(auth)} className="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-rose-600 transition-colors">
-            <LogOut className="w-4 h-4" /> Sign Out
+        <div className="flex items-center gap-4 relative">
+          <button 
+            onClick={() => setShowUserMenu(!showUserMenu)}
+            className="flex items-center gap-3 px-3 py-1.5 bg-white border border-gray-100 rounded-full hover:bg-gray-50 transition-all shadow-sm group"
+          >
+            <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold text-xs shadow-inner">
+              {user?.displayName?.[0] || user?.email?.[0]}
+            </div>
+            <div className="hidden md:flex flex-col items-start leading-none">
+              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Welcome</span>
+              <span className="text-sm font-bold text-gray-700 group-hover:text-indigo-600 transition-colors">
+                {user?.displayName || user?.email?.split('@')[0]}
+              </span>
+            </div>
+            <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${showUserMenu ? 'rotate-180' : ''}`} />
           </button>
+
+          {showUserMenu && (
+            <div className="absolute right-0 top-full mt-3 w-72 bg-white rounded-3xl shadow-2xl shadow-indigo-200/50 border border-gray-50 py-4 z-50 animate-in fade-in slide-in-from-top-2">
+              <div className="px-6 py-4 border-b border-gray-50 mb-3">
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Signed in as</p>
+                <p className="text-sm font-bold text-gray-800 truncate">{user?.email}</p>
+              </div>
+
+              <div className="px-4 mb-3">
+                <div className="bg-gray-50 rounded-2xl p-4 flex justify-between items-center">
+                  <div className="text-center flex-1">
+                    <div className="text-orange-500 font-black text-lg leading-none mb-1">{streak}</div>
+                    <div className="text-[9px] font-bold text-gray-400 uppercase">Streak</div>
+                  </div>
+                  <div className="w-[1px] h-8 bg-gray-200"></div>
+                  <div className="text-center flex-1">
+                    <div className="text-indigo-600 font-black text-lg leading-none mb-1">{totalMastered}</div>
+                    <div className="text-[9px] font-bold text-gray-400 uppercase">Mastered</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="px-2 space-y-1">
+                <button 
+                  onClick={() => setDarkMode(!darkMode)}
+                  className="w-full flex items-center justify-between px-4 py-3 text-sm font-bold text-gray-600 hover:bg-gray-50 rounded-xl transition-all"
+                >
+                  <div className="flex items-center gap-3">
+                    {darkMode ? <Sun className="w-4 h-4 text-amber-500"/> : <Moon className="w-4 h-4 text-indigo-500"/>}
+                    {darkMode ? 'Light Mode' : 'Dark Mode'}
+                  </div>
+                  <div className={`w-10 h-5 rounded-full relative transition-colors ${darkMode ? 'bg-amber-400' : 'bg-gray-200'}`}>
+                    <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${darkMode ? 'right-1' : 'left-1'}`}></div>
+                  </div>
+                </button>
+
+                <div className="h-[1px] bg-gray-50 my-2 mx-4"></div>
+
+                <button 
+                  onClick={() => signOut(auth)}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
+                >
+                  <LogOut className="w-4 h-4" /> Sign Out
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </header>
 
@@ -463,31 +590,105 @@ export default function App() {
             )}
 
             {activeTab === 'manage' && (
-              <div className="max-w-5xl w-full mx-auto p-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-2xl font-bold">Vocabulary Library</h2>
-                  <button onClick={() => setShowAddModal(true)} className="bg-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-bold"><Plus className="w-4 h-4"/> Add Word</button>
+              <div className="max-w-6xl w-full mx-auto p-6">
+                <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                  <h2 className="text-2xl font-bold text-gray-900">Vocabulary Library</h2>
+                  <div className="flex flex-wrap gap-2 w-full md:w-auto">
+                    <div className="relative flex-1 md:w-64">
+                       <SearchX className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
+                       <input 
+                         type="text" placeholder="Search word or meaning..." 
+                         value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
+                         className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                       />
+                    </div>
+                    <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                      <option value="all">All Types</option>
+                      <option value="noun">Noun</option>
+                      <option value="verb">Verb</option>
+                      <option value="adj">Adjective</option>
+                    </select>
+                    <button 
+                      onClick={() => { setEditingWord(null); setShowAddModal(true); }} 
+                      className="bg-indigo-600 text-white px-5 py-2 rounded-xl flex items-center gap-2 font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all"
+                    >
+                      <Plus className="w-5 h-5"/> Add Word
+                    </button>
+                  </div>
                 </div>
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto">
-                  <table className="w-full text-left">
-                    <thead className="bg-gray-50 text-xs font-bold text-gray-500 uppercase">
-                      <tr><th className="p-4">Word</th><th className="p-4">Meaning</th><th className="p-4">Score</th><th className="p-4">Status</th></tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {vocab.map(v => (
-                        <tr key={v.stt} className="hover:bg-gray-50">
-                          <td className="p-4 font-bold">{v.word}</td>
-                          <td className="p-4 text-gray-600">{v.meaning}</td>
-                          <td className="p-4 text-indigo-600 font-bold">{wordStats[v.stt]?.score || 0}</td>
-                          <td className="p-4">
-                            <span className={`px-2 py-1 text-xs font-bold rounded-full ${wordStats[v.stt]?.score >= 5 ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-50 text-blue-600'}`}>
-                              {wordStats[v.stt]?.score >= 5 ? 'Mastered' : 'Learning'}
-                            </span>
-                          </td>
+
+                <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                      <thead className="bg-gray-50 text-xs font-bold text-gray-400 uppercase tracking-widest">
+                        <tr>
+                          <th className="p-5">Word</th>
+                          <th className="p-5">Meaning</th>
+                          <th className="p-5">Stats</th>
+                          <th className="p-5">Status</th>
+                          <th className="p-5 text-center">Actions</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className="divide-y divide-gray-50">
+                        {vocab
+                          .filter(v => 
+                            (v.word.toLowerCase().includes(searchTerm.toLowerCase()) || v.meaning.toLowerCase().includes(searchTerm.toLowerCase())) &&
+                            (filterType === 'all' || v.type === filterType)
+                          )
+                          .map(v => {
+                            const stats = wordStats[v.stt] || { score: 0, attempts: 0 };
+                            const isMastered = stats.score >= 5;
+                            return (
+                              <tr key={v.stt} className="hover:bg-indigo-50/30 transition-colors group">
+                                <td className="p-5">
+                                  <div className="font-bold text-gray-900 text-lg flex items-center gap-2">
+                                    {v.word}
+                                    <button onClick={() => playAudio(v.word)} className="text-gray-300 hover:text-indigo-600 transition-colors opacity-0 group-hover:opacity-100"><Volume2 className="w-4 h-4"/></button>
+                                  </div>
+                                  <div className="text-xs text-gray-400 font-mono">{v.phonetic} • {v.type}</div>
+                                </td>
+                                <td className="p-5 text-gray-600 font-medium">{v.meaning}</td>
+                                <td className="p-5">
+                                  <div className="text-sm font-bold text-indigo-600">{stats.score} pts</div>
+                                  <div className="text-[10px] text-gray-400 uppercase tracking-tighter">{stats.attempts} attempts</div>
+                                </td>
+                                <td className="p-5">
+                                  <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full ${isMastered ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                                    {isMastered ? 'Mastered' : 'Learning'}
+                                  </span>
+                                </td>
+                                <td className="p-5">
+                                  <div className="flex justify-center gap-2">
+                                    <button 
+                                      onClick={() => { 
+                                        setEditingWord(v); 
+                                        setNewWord({ word: v.word, meaning: v.meaning, type: v.type, phonetic: v.phonetic || '', tags: (v.tags || []).join(', ') });
+                                        setShowAddModal(true); 
+                                      }}
+                                      className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                                    >
+                                      <Settings className="w-4 h-4" />
+                                    </button>
+                                    <button 
+                                      onClick={async () => {
+                                        if (window.confirm(`Delete "${v.word}"?`)) {
+                                          const newVocab = vocab.filter(item => item.stt !== v.stt);
+                                          setVocab(newVocab);
+                                          await syncVocab(newVocab);
+                                        }
+                                      }}
+                                      className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             )}
@@ -495,43 +696,151 @@ export default function App() {
         )}
       </main>
 
-      {/* Add Word Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <form onSubmit={handleAddWord} className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl">
-            <h3 className="text-2xl font-bold mb-6">Add New Vocabulary</h3>
-            <div className="space-y-4">
-              <input type="text" placeholder="Word (e.g. Serendipity)" value={newWord.word} onChange={e => setNewWord({...newWord, word: e.target.value})} className="w-full p-3 border rounded-xl" required />
-              <input type="text" placeholder="Meaning (e.g. Sự tình cờ may mắn)" value={newWord.meaning} onChange={e => setNewWord({...newWord, meaning: e.target.value})} className="w-full p-3 border rounded-xl" required />
-              <div className="grid grid-cols-2 gap-4">
-                <select value={newWord.type} onChange={e => setNewWord({...newWord, type: e.target.value})} className="p-3 border rounded-xl">
-                  <option value="noun">Noun</option><option value="verb">Verb</option><option value="adj">Adjective</option>
-                </select>
-                <input type="text" placeholder="Phonetic" value={newWord.phonetic} onChange={e => setNewWord({...newWord, phonetic: e.target.value})} className="p-3 border rounded-xl" />
-              </div>  
-              <input type="text" placeholder="Tags (comma separated)" value={newWord.tags} onChange={e => setNewWord({...newWord, tags: e.target.value})} className="w-full p-3 border rounded-xl" />
-            </div>
-            <div className="flex gap-4 mt-8">
-              <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 py-3 font-bold text-gray-500">Cancel</button>
-              <button type="submit" className="flex-1 py-3 bg-indigo-600 text-white rounded-xl font-bold">Save Word</button>
-            </div>
-          </form>
+      {/* Footer / Credit */}
+      <footer className="bg-white border-t border-gray-100 py-6 px-4">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-indigo-600">Vocab Learner Pro</span>
+            <span>&copy; {new Date().getFullYear()}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            Developed with <span className="text-rose-500 text-lg">♥</span> by 
+            <a href="https://github.com/taiituan13" target="_blank" rel="noopener noreferrer" className="font-bold text-gray-800 hover:text-indigo-600 transition-colors ml-1">
+              Nguyen Tuan Tai
+            </a>
+          </div>
+          <div className="flex gap-4">
+            <a href="https://github.com/taiituan13/Vocab-Learner" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-600">Open Source</a>
+            <span className="opacity-30">|</span>
+            <span>v1.0.0</span>
+          </div>
         </div>
-      )}
+      </footer>
 
-      {/* Settings Modal (Import/Export) */}
-      {showSettings && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-8 w-full max-w-2xl shadow-2xl">
-            <h3 className="text-2xl font-bold mb-4">Backup & Restore</h3>
-            <textarea value={jsonInput} onChange={e => setJsonInput(e.target.value)} className="w-full h-64 p-4 border rounded-xl font-mono text-xs mb-4" />
-            <div className="flex gap-4">
-              <button onClick={() => setShowSettings(false)} className="px-6 py-2 font-bold text-gray-500">Close</button>
-              <button onClick={handleImportJson} className="bg-indigo-600 text-white px-6 py-2 rounded-xl font-bold">Import JSON</button>
+      {/* Unified Vocabulary Management Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Modal Tabs */}
+            <div className="flex bg-gray-50 border-b border-gray-100">
+              <button onClick={() => setDataTab('single')} className={`flex-1 py-4 text-sm font-bold flex items-center justify-center gap-2 transition-all ${dataTab === 'single' ? 'bg-white text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-400 hover:text-gray-600'}`}>
+                <Plus className="w-4 h-4"/> {editingWord ? 'Edit Word' : 'Add Word'}
+              </button>
+              <button onClick={() => setDataTab('import')} className={`flex-1 py-4 text-sm font-bold flex items-center justify-center gap-2 transition-all ${dataTab === 'import' ? 'bg-white text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-400 hover:text-gray-600'}`}>
+                <Upload className="w-4 h-4"/> Import
+              </button>
+              <button onClick={() => { setDataTab('export'); setJsonInput(JSON.stringify(vocab, null, 2)); }} className={`flex-1 py-4 text-sm font-bold flex items-center justify-center gap-2 transition-all ${dataTab === 'export' ? 'bg-white text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-400 hover:text-gray-600'}`}>
+                <Download className="w-4 h-4"/> Export
+              </button>
+              <button onClick={() => { setShowAddModal(false); setEditingWord(null); }} className="p-4 text-gray-400 hover:text-gray-600"><XCircle className="w-6 h-6"/></button>
+            </div>
+
+            <div className="p-8">
+              {dataTab === 'single' && (
+                <form onSubmit={handleAddWord} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1 block">English Word</label>
+                      <input type="text" placeholder="e.g. Epiphany" value={newWord.word} onChange={e => setNewWord({...newWord, word: e.target.value})} className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" required />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1 block">Meaning</label>
+                      <input type="text" placeholder="e.g. Sự hiển linh" value={newWord.meaning} onChange={e => setNewWord({...newWord, meaning: e.target.value})} className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" required />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1 block">Type</label>
+                      <select value={newWord.type} onChange={e => setNewWord({...newWord, type: e.target.value})} className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="noun">Noun</option><option value="verb">Verb</option><option value="adj">Adjective</option><option value="adv">Adverb</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1 block">Phonetic</label>
+                      <input type="text" placeholder="/ɪˈpɪf.ə.ni/" value={newWord.phonetic} onChange={e => setNewWord({...newWord, phonetic: e.target.value})} className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1 block">Tags (comma separated)</label>
+                    <input type="text" placeholder="academic, daily" value={newWord.tags} onChange={e => setNewWord({...newWord, tags: e.target.value})} className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500" />
+                  </div>
+                  <button type="submit" className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all uppercase tracking-widest text-sm mt-4">
+                    {editingWord ? 'Update Word' : 'Save Word'}
+                  </button>
+                </form>
+              )}
+
+              {dataTab === 'import' && (
+                <div className="space-y-6">
+                  <div className="text-sm text-gray-500 bg-indigo-50 p-4 rounded-xl flex gap-3">
+                    <AlertTriangle className="w-5 h-5 text-indigo-600 flex-shrink-0" />
+                    <p>Paste your <strong>JSON array</strong> or <strong>CSV text</strong> (STT, Word, Meaning, Type, Phonetic, Tags) below. All new words will be merged with your existing library.</p>
+                  </div>
+                  <textarea 
+                    value={jsonInput} onChange={e => setJsonInput(e.target.value)} 
+                    placeholder="[ { 'word': 'example', ... } ] OR CSV rows..."
+                    className="w-full h-48 p-4 bg-gray-50 border border-gray-100 rounded-xl font-mono text-xs focus:ring-2 focus:ring-indigo-500 outline-none" 
+                  />
+                  <div className="grid grid-cols-2 gap-4">
+                    <button onClick={handleImportJson} className="py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition-all">Import as JSON</button>
+                    <button 
+                      onClick={async () => {
+                        const parsed = parseCSV(jsonInput);
+                        if (parsed.length > 0) {
+                          const baseSTT = vocab.length > 0 ? Math.max(...vocab.map(v => v.stt)) + 1 : 1;
+                          const newItems = parsed.map((v, i) => ({ ...v, stt: baseSTT + i, archived: false } as VocabItem));
+                          const newVocab = [...vocab, ...newItems];
+                          setVocab(newVocab); await syncVocab(newVocab);
+                          alert(`Imported ${newItems.length} words from CSV!`);
+                          setShowAddModal(false);
+                        } else { alert("Invalid CSV format"); }
+                      }} 
+                      className="py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all"
+                    >
+                      Import as CSV
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {dataTab === 'export' && (
+                <div className="space-y-6 text-center">
+                  <div className="p-8 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+                    <Download className="w-12 h-12 text-indigo-300 mx-auto mb-4" />
+                    <h4 className="font-bold text-gray-900 mb-1">Download Library Backup</h4>
+                    <p className="text-sm text-gray-500 mb-6">Choose your preferred format to save your vocabulary.</p>
+                    <div className="grid grid-cols-2 gap-4">
+                      <button 
+                        onClick={() => {
+                          const blob = new Blob([JSON.stringify(vocab, null, 2)], { type: 'application/json' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a'); a.href = url; a.download = 'vocab_backup.json'; a.click();
+                        }}
+                        className="py-3 bg-white border border-gray-200 rounded-xl font-bold text-gray-700 hover:bg-gray-50"
+                      >
+                        Download JSON
+                      </button>
+                      <button 
+                        onClick={() => {
+                          const csv = convertToCSV(vocab);
+                          const blob = new Blob(["\uFEFF", csv], { type: 'text/csv;charset=utf-8' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a'); a.href = url; a.download = 'vocab_export.csv'; a.click();
+                        }}
+                        className="py-3 bg-indigo-50 text-indigo-700 rounded-xl font-bold hover:bg-indigo-100"
+                      >
+                        Download CSV
+                      </button>
+                    </div>
+                  </div>
+                  <div className="text-left">
+                    <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1 block">Raw JSON Data</label>
+                    <textarea readOnly value={jsonInput} className="w-full h-32 p-4 bg-gray-50 border border-gray-100 rounded-xl font-mono text-[10px] text-gray-400" />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
       )}
-    </div>
+      {/* Footer / Credit */}    </div>
   );
 }
