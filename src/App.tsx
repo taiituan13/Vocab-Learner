@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Settings, CheckCircle, XCircle, AlertTriangle, Lightbulb, SearchX, RefreshCcw, BarChart2, BookOpen, Download, Upload, Play, Library, Archive, RotateCcw, Target, Flame, Volume2, ShieldAlert, Trash2, LogOut, Plus, UserPlus, ChevronDown, Sun, Moon } from 'lucide-react';
+import { Settings, SearchX, BarChart2, BookOpen, Play, Library, Volume2, Trash2, LogOut, Plus, ChevronDown, Sun, Moon, Info, ExternalLink } from 'lucide-react';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, YAxis, CartesianGrid } from 'recharts';
 import { diffChars } from 'diff';
 import { useAuth } from './hooks/useAuth';
 import Auth from './components/Auth';
+import AddModal from './components/AddModal';
 import { signOut } from 'firebase/auth';
 import { auth } from './firebase';
 import { 
@@ -12,6 +13,16 @@ import {
   getDailyStats, saveDailyStats, 
   VocabItem, WordStats, DayStats 
 } from './services/vocabService';
+
+interface DictionaryInfo {
+  phonetic?: string;
+  definition?: string;
+  partOfSpeech?: string;
+  example?: string;
+  synonyms?: string[];
+  antonyms?: string[];
+  sourceUrl?: string;
+}
 
 const DEFAULT_VOCAB: VocabItem[] = [];
 
@@ -78,13 +89,12 @@ export default function App() {
   const [hintUsed, setHintUsed] = useState(false);
   const [sessionStats, setSessionStats] = useState({ correct: 0, incorrect: 0, typo: 0, mistakes: {} as Record<number, number> });
   
-  const [showSettings, setShowSettings] = useState(false);
+  const [dictionaryInfo, setDictionaryInfo] = useState<DictionaryInfo | null>(null);
+
   // UI States
   const [showAddModal, setShowAddModal] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
-  const [jsonInput, setJsonInput] = useState('');
-  const [dataTab, setDataTab] = useState<'single' | 'import' | 'export'>('single');
 
   // Apply Theme
   useEffect(() => {
@@ -96,47 +106,37 @@ export default function App() {
       localStorage.setItem('theme', 'light');
     }
   }, [darkMode]);
+
   // Management States
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
-  const [filterStatus, setFilterStatus] = useState('all');
   const [editingWord, setEditingWord] = useState<VocabItem | null>(null);
-  
-  // New Word Form State
-  const [newWord, setNewWord] = useState({ word: '', meaning: '', type: 'noun', phonetic: '', tags: '' });
   
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // CSV Helpers
-  const convertToCSV = (items: VocabItem[]) => {
-    const header = ['STT', 'Word', 'Meaning', 'Type', 'Phonetic', 'Tags'];
-    const rows = items.map(v => [
-      v.stt,
-      `"${v.word.replace(/"/g, '""')}"`,
-      `"${v.meaning.replace(/"/g, '""')}"`,
-      v.type,
-      `"${(v.phonetic || '').replace(/"/g, '""')}"`,
-      `"${(v.tags || []).join(';')}"`
-    ]);
-    return [header.join(','), ...rows.map(r => r.join(','))].join('\n');
-  };
-
-  const parseCSV = (csvText: string): Partial<VocabItem>[] => {
-    const lines = csvText.split('\n').filter(l => l.trim());
-    if (lines.length < 2) return [];
-    
-    // Simple CSV parser (handles basic quoted fields)
-    return lines.slice(1).map(line => {
-      const parts = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
-      const clean = (s: string) => s ? s.replace(/^"|"$/g, '').replace(/""/g, '"').trim() : '';
-      return {
-        word: clean(parts[1]),
-        meaning: clean(parts[2]),
-        type: clean(parts[3]) || 'noun',
-        phonetic: clean(parts[4]),
-        tags: clean(parts[5]) ? clean(parts[5]).split(';') : []
-      };
-    }).filter(v => v.word && v.meaning);
+  const fetchDictionaryInfo = async (word: string) => {
+    try {
+      const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word.toLowerCase()}`);
+      if (!response.ok) return;
+      const data = await response.json();
+      if (data && data.length > 0) {
+        const entry = data[0];
+        const meaning = entry.meanings[0];
+        const def = meaning.definitions[0];
+        
+        setDictionaryInfo({
+          phonetic: entry.phonetic || (entry.phonetics && entry.phonetics.find((p: any) => p.text)?.text),
+          definition: def.definition,
+          partOfSpeech: meaning.partOfSpeech,
+          example: def.example,
+          synonyms: def.synonyms?.slice(0, 3) || meaning.synonyms?.slice(0, 3),
+          antonyms: def.antonyms?.slice(0, 3) || meaning.antonyms?.slice(0, 3),
+          sourceUrl: entry.sourceUrls?.[0]
+        });
+      }
+    } catch (e) {
+      console.error("Error fetching dictionary info:", e);
+    }
   };
 
   // Load Data from Firestore
@@ -159,9 +159,12 @@ export default function App() {
     fetchData();
   }, [user]);
 
-  // Sync Data to Firestore (Debounced/Throttled in real app, but direct here for simplicity)
+  // Sync Data to Firestore
   const syncVocab = useCallback(async (newVocab: VocabItem[]) => {
-    if (user) await saveVocabulary(user.uid, newVocab);
+    if (user) {
+      setVocab(newVocab);
+      await saveVocabulary(user.uid, newVocab);
+    }
   }, [user]);
 
   const syncStats = useCallback(async (newWs: Record<number, WordStats>, newDs: Record<string, DayStats>) => {
@@ -229,6 +232,7 @@ export default function App() {
     setHintUsed(false);
     setHasFailedWord(false);
     setLastWrongTyped('');
+    setDictionaryInfo(null);
     
     if (!isMcq) setTimeout(() => inputRef.current?.focus(), 50);
   }, [vocab, targetVocabList, wordStats]);
@@ -303,6 +307,7 @@ export default function App() {
       applyScoreDelta(currentWord.stt, hasFailedWord ? 0 : (hintUsed ? 0 : 1), 'correct');
       setStatus('answered');
       playAudio(currentWord.word);
+      fetchDictionaryInfo(currentWord.word);
     } else {
       const isTypo = dist <= threshold;
       setFeedback({ type: isTypo ? 'typo' : 'incorrect', message: isTypo ? "Close! Pay attention." : "Incorrect." });
@@ -328,12 +333,13 @@ export default function App() {
     }
     setStatus('answered');
     playAudio(currentWord.word);
+    fetchDictionaryInfo(currentWord.word);
   }, [status, quizMode, currentWord, mcqOptions, applyScoreDelta]);
 
   // Keyboard Handlers
   useEffect(() => {
     const handleGlobalKey = (e: KeyboardEvent) => {
-      if (showSettings || showAddModal || activeTab !== 'quiz') return;
+      if (showAddModal || activeTab !== 'quiz') return;
       if (e.ctrlKey && e.code === 'Space') { e.preventDefault(); useHint(); return; }
       if (e.ctrlKey && e.key === 'Enter') { e.preventDefault(); nextWord(); return; }
       if (!e.ctrlKey && e.key === 'Enter') {
@@ -349,7 +355,7 @@ export default function App() {
     };
     window.addEventListener('keydown', handleGlobalKey);
     return () => window.removeEventListener('keydown', handleGlobalKey);
-  }, [activeTab, status, quizMode, showSettings, showAddModal, useHint, checkTypingAnswer, handleMcqSelection, nextWord]);
+  }, [activeTab, status, quizMode, showAddModal, useHint, checkTypingAnswer, handleMcqSelection, nextWord]);
 
   // Dashboard Stats
   const streak = useMemo(() => {
@@ -376,54 +382,6 @@ export default function App() {
     }
     return data;
   }, [dailyStats]);
-
-  const handleAddWord = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (editingWord) {
-      // Update logic
-      const newVocab = vocab.map(v => v.stt === editingWord.stt ? {
-        ...v,
-        word: newWord.word.trim(),
-        meaning: newWord.meaning.trim(),
-        type: newWord.type,
-        phonetic: newWord.phonetic.trim(),
-        tags: newWord.tags.split(',').map(t => t.trim()).filter(t => t)
-      } : v);
-      setVocab(newVocab);
-      await syncVocab(newVocab);
-    } else {
-      // Add logic
-      const stt = vocab.length > 0 ? Math.max(...vocab.map(v => v.stt)) + 1 : 1;
-      const item: VocabItem = {
-        stt,
-        word: newWord.word.trim(),
-        meaning: newWord.meaning.trim(),
-        type: newWord.type,
-        phonetic: newWord.phonetic.trim(),
-        tags: newWord.tags.split(',').map(t => t.trim()).filter(t => t),
-        archived: false
-      };
-      const newVocab = [...vocab, item];
-      setVocab(newVocab);
-      await syncVocab(newVocab);
-    }
-    
-    setShowAddModal(false);
-    setEditingWord(null);
-    setNewWord({ word: '', meaning: '', type: 'noun', phonetic: '', tags: '' });
-  };
-
-  const handleImportJson = async () => {
-    try {
-      const parsed = JSON.parse(jsonInput);
-      if (Array.isArray(parsed)) {
-        setVocab(parsed);
-        await syncVocab(parsed);
-        setShowSettings(false);
-      }
-    } catch(e) { alert("Invalid JSON"); }
-  };
 
   const stringDiff = useMemo(() => {
     if (!hasFailedWord || !lastWrongTyped || !currentWord) return null;
@@ -562,7 +520,88 @@ export default function App() {
                         </div>
                       </>
                     )}
-                    {status === 'answered' && <button onClick={() => nextWord()} className="w-full py-4 bg-gray-900 text-white rounded-xl font-bold uppercase tracking-widest">Next Word</button>}
+                    {status === 'answered' && (
+                      <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        {/* Correct Answer Header for Typing Mode */}
+                        {/* {quizMode === 'typing' && !feedback?.message && (
+                          <div className="flex flex-col items-center mb-6">
+                            <span className="text-emerald-500 font-black text-6xl mb-2">✓</span>
+                            <h3 className="text-3xl font-bold text-emerald-600">{currentWord.word}</h3>
+                          </div>
+                        )} */}
+
+                        {dictionaryInfo ? (
+                          <div className="bg-gray-50 rounded-3xl p-6 md:p-8 text-left border border-gray-100 shadow-inner">
+                            <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+                              <div className="flex items-center gap-2 text-gray-400 font-mono italic">
+                                {dictionaryInfo.phonetic}
+                                <button onClick={() => playAudio(currentWord.word)} className="p-2 hover:bg-white rounded-full transition-colors">
+                                  <Volume2 className="w-5 h-5 text-indigo-500" />
+                                </button>
+                              </div>
+                            </div>
+
+                            <div className="space-y-4">
+                              <div>
+                                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                                  <Info className="w-3.5 h-3.5" /> Definition
+                                </p>
+                                <p className="text-gray-700 leading-relaxed font-medium">
+                                  {dictionaryInfo.definition}
+                                </p>
+                              </div>
+
+                              {dictionaryInfo.example && (
+                                <div className="pl-4 border-l-4 border-indigo-100">
+                                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Example</p>
+                                  <p className="text-gray-600 italic">"{dictionaryInfo.example}"</p>
+                                </div>
+                              )}
+
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                                {dictionaryInfo.synonyms && dictionaryInfo.synonyms.length > 0 && (
+                                  <div>
+                                    <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-1.5">Synonyms</p>
+                                    <div className="flex flex-wrap gap-1.5">
+                                      {dictionaryInfo.synonyms.map(s => (
+                                        <span key={s} className="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[11px] rounded-md border border-emerald-100 font-medium">{s}</span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                                {dictionaryInfo.antonyms && dictionaryInfo.antonyms.length > 0 && (
+                                  <div>
+                                    <p className="text-[10px] font-bold text-rose-600 uppercase tracking-widest mb-1.5">Antonyms</p>
+                                    <div className="flex flex-wrap gap-1.5">
+                                      {dictionaryInfo.antonyms.map(a => (
+                                        <span key={a} className="px-2 py-0.5 bg-rose-50 text-rose-700 text-[11px] rounded-md border border-rose-100 font-medium">{a}</span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+
+                              {dictionaryInfo.sourceUrl && (
+                                <div className="pt-2">
+                                  <a href={dictionaryInfo.sourceUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[11px] font-bold text-indigo-500 hover:text-indigo-700 transition-colors uppercase tracking-widest">
+                                    Full Details <ExternalLink className="w-3 h-3" />
+                                  </a>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="py-12 animate-pulse flex flex-col items-center">
+                            <div className="h-4 w-48 bg-gray-100 rounded-full mb-4"></div>
+                            <div className="h-4 w-32 bg-gray-50 rounded-full"></div>
+                          </div>
+                        )}
+                        
+                        <button onClick={() => nextWord()} className="w-full py-4 bg-gray-900 text-white rounded-2xl font-bold uppercase tracking-widest shadow-xl shadow-gray-200 hover:bg-black hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-2">
+                          Next Word <Play className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -662,7 +701,6 @@ export default function App() {
                                     <button 
                                       onClick={() => { 
                                         setEditingWord(v); 
-                                        setNewWord({ word: v.word, meaning: v.meaning, type: v.type, phonetic: v.phonetic || '', tags: (v.tags || []).join(', ') });
                                         setShowAddModal(true); 
                                       }}
                                       className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
@@ -673,7 +711,6 @@ export default function App() {
                                       onClick={async () => {
                                         if (window.confirm(`Delete "${v.word}"?`)) {
                                           const newVocab = vocab.filter(item => item.stt !== v.stt);
-                                          setVocab(newVocab);
                                           await syncVocab(newVocab);
                                         }
                                       }}
@@ -717,130 +754,13 @@ export default function App() {
         </div>
       </footer>
 
-      {/* Unified Vocabulary Management Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-            {/* Modal Tabs */}
-            <div className="flex bg-gray-50 border-b border-gray-100">
-              <button onClick={() => setDataTab('single')} className={`flex-1 py-4 text-sm font-bold flex items-center justify-center gap-2 transition-all ${dataTab === 'single' ? 'bg-white text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-400 hover:text-gray-600'}`}>
-                <Plus className="w-4 h-4"/> {editingWord ? 'Edit Word' : 'Add Word'}
-              </button>
-              <button onClick={() => setDataTab('import')} className={`flex-1 py-4 text-sm font-bold flex items-center justify-center gap-2 transition-all ${dataTab === 'import' ? 'bg-white text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-400 hover:text-gray-600'}`}>
-                <Upload className="w-4 h-4"/> Import
-              </button>
-              <button onClick={() => { setDataTab('export'); setJsonInput(JSON.stringify(vocab, null, 2)); }} className={`flex-1 py-4 text-sm font-bold flex items-center justify-center gap-2 transition-all ${dataTab === 'export' ? 'bg-white text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-400 hover:text-gray-600'}`}>
-                <Download className="w-4 h-4"/> Export
-              </button>
-              <button onClick={() => { setShowAddModal(false); setEditingWord(null); }} className="p-4 text-gray-400 hover:text-gray-600"><XCircle className="w-6 h-6"/></button>
-            </div>
-
-            <div className="p-8">
-              {dataTab === 'single' && (
-                <form onSubmit={handleAddWord} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1 block">English Word</label>
-                      <input type="text" placeholder="e.g. Epiphany" value={newWord.word} onChange={e => setNewWord({...newWord, word: e.target.value})} className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" required />
-                    </div>
-                    <div>
-                      <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1 block">Meaning</label>
-                      <input type="text" placeholder="e.g. Sự hiển linh" value={newWord.meaning} onChange={e => setNewWord({...newWord, meaning: e.target.value})} className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" required />
-                    </div>
-                    <div>
-                      <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1 block">Type</label>
-                      <select value={newWord.type} onChange={e => setNewWord({...newWord, type: e.target.value})} className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
-                        <option value="noun">Noun</option><option value="verb">Verb</option><option value="adj">Adjective</option><option value="adv">Adverb</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1 block">Phonetic</label>
-                      <input type="text" placeholder="/ɪˈpɪf.ə.ni/" value={newWord.phonetic} onChange={e => setNewWord({...newWord, phonetic: e.target.value})} className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500" />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1 block">Tags (comma separated)</label>
-                    <input type="text" placeholder="academic, daily" value={newWord.tags} onChange={e => setNewWord({...newWord, tags: e.target.value})} className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500" />
-                  </div>
-                  <button type="submit" className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all uppercase tracking-widest text-sm mt-4">
-                    {editingWord ? 'Update Word' : 'Save Word'}
-                  </button>
-                </form>
-              )}
-
-              {dataTab === 'import' && (
-                <div className="space-y-6">
-                  <div className="text-sm text-gray-500 bg-indigo-50 p-4 rounded-xl flex gap-3">
-                    <AlertTriangle className="w-5 h-5 text-indigo-600 flex-shrink-0" />
-                    <p>Paste your <strong>JSON array</strong> or <strong>CSV text</strong> (STT, Word, Meaning, Type, Phonetic, Tags) below. All new words will be merged with your existing library.</p>
-                  </div>
-                  <textarea 
-                    value={jsonInput} onChange={e => setJsonInput(e.target.value)} 
-                    placeholder="[ { 'word': 'example', ... } ] OR CSV rows..."
-                    className="w-full h-48 p-4 bg-gray-50 border border-gray-100 rounded-xl font-mono text-xs focus:ring-2 focus:ring-indigo-500 outline-none" 
-                  />
-                  <div className="grid grid-cols-2 gap-4">
-                    <button onClick={handleImportJson} className="py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition-all">Import as JSON</button>
-                    <button 
-                      onClick={async () => {
-                        const parsed = parseCSV(jsonInput);
-                        if (parsed.length > 0) {
-                          const baseSTT = vocab.length > 0 ? Math.max(...vocab.map(v => v.stt)) + 1 : 1;
-                          const newItems = parsed.map((v, i) => ({ ...v, stt: baseSTT + i, archived: false } as VocabItem));
-                          const newVocab = [...vocab, ...newItems];
-                          setVocab(newVocab); await syncVocab(newVocab);
-                          alert(`Imported ${newItems.length} words from CSV!`);
-                          setShowAddModal(false);
-                        } else { alert("Invalid CSV format"); }
-                      }} 
-                      className="py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all"
-                    >
-                      Import as CSV
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {dataTab === 'export' && (
-                <div className="space-y-6 text-center">
-                  <div className="p-8 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
-                    <Download className="w-12 h-12 text-indigo-300 mx-auto mb-4" />
-                    <h4 className="font-bold text-gray-900 mb-1">Download Library Backup</h4>
-                    <p className="text-sm text-gray-500 mb-6">Choose your preferred format to save your vocabulary.</p>
-                    <div className="grid grid-cols-2 gap-4">
-                      <button 
-                        onClick={() => {
-                          const blob = new Blob([JSON.stringify(vocab, null, 2)], { type: 'application/json' });
-                          const url = URL.createObjectURL(blob);
-                          const a = document.createElement('a'); a.href = url; a.download = 'vocab_backup.json'; a.click();
-                        }}
-                        className="py-3 bg-white border border-gray-200 rounded-xl font-bold text-gray-700 hover:bg-gray-50"
-                      >
-                        Download JSON
-                      </button>
-                      <button 
-                        onClick={() => {
-                          const csv = convertToCSV(vocab);
-                          const blob = new Blob(["\uFEFF", csv], { type: 'text/csv;charset=utf-8' });
-                          const url = URL.createObjectURL(blob);
-                          const a = document.createElement('a'); a.href = url; a.download = 'vocab_export.csv'; a.click();
-                        }}
-                        className="py-3 bg-indigo-50 text-indigo-700 rounded-xl font-bold hover:bg-indigo-100"
-                      >
-                        Download CSV
-                      </button>
-                    </div>
-                  </div>
-                  <div className="text-left">
-                    <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1 block">Raw JSON Data</label>
-                    <textarea readOnly value={jsonInput} className="w-full h-32 p-4 bg-gray-50 border border-gray-100 rounded-xl font-mono text-[10px] text-gray-400" />
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-      {/* Footer / Credit */}    </div>
+      <AddModal 
+        isOpen={showAddModal} 
+        onClose={() => { setShowAddModal(false); setEditingWord(null); }}
+        vocab={vocab}
+        editingWord={editingWord}
+        onSuccess={syncVocab}
+      />
+    </div>
   );
 }
