@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Settings, SearchX, BarChart2, BookOpen, Play, Library, Volume2, Trash2, LogOut, Plus, ChevronDown, Sun, Moon, Info, ExternalLink } from 'lucide-react';
+import { Settings, SearchX, BarChart2, BookOpen, Play, Library, Volume2, Trash2, LogOut, Plus, ChevronDown, Sun, Moon, Info, ExternalLink, Headphones } from 'lucide-react';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, YAxis, CartesianGrid } from 'recharts';
 import { diffChars } from 'diff';
 import { useAuth } from './hooks/useAuth';
 import Auth from './components/Auth';
 import AddModal from './components/AddModal';
+import DictationModule from './components/Dictation/DictationModule';
 import { signOut } from 'firebase/auth';
 import { auth } from './firebase';
 import { 
@@ -71,7 +72,7 @@ export default function App() {
   const [wordStats, setWordStats] = useState<Record<number, WordStats>>({});
   const [dailyStats, setDailyStats] = useState<Record<string, DayStats>>({});
   
-  const [activeTab, setActiveTab] = useState<'quiz' | 'stats' | 'manage'>('quiz');
+  const [activeTab, setActiveTab] = useState<'quiz' | 'stats' | 'manage' | 'dictation'>('quiz');
   const [selectedTag, setSelectedTag] = useState<string>('all');
   
   // Quiz states
@@ -404,6 +405,7 @@ export default function App() {
         
         <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
           <button onClick={() => setActiveTab('quiz')} className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all ${activeTab === 'quiz' ? 'bg-white dark:bg-gray-700 shadow-sm text-indigo-700 dark:text-indigo-300' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}><Play className="w-4 h-4" /> Quiz</button>
+          <button onClick={() => setActiveTab('dictation')} className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all ${activeTab === 'dictation' ? 'bg-white dark:bg-gray-700 shadow-sm text-indigo-700 dark:text-indigo-300' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}><Headphones className="w-4 h-4" /> Dictation</button>
           <button onClick={() => setActiveTab('stats')} className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all ${activeTab === 'stats' ? 'bg-white dark:bg-gray-700 shadow-sm text-indigo-700 dark:text-indigo-300' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}><BarChart2 className="w-4 h-4" /> Stats</button>
           <button onClick={() => setActiveTab('manage')} className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all ${activeTab === 'manage' ? 'bg-white dark:bg-gray-700 shadow-sm text-indigo-700 dark:text-indigo-300' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}><Library className="w-4 h-4" /> Manage</button>
         </div>
@@ -476,7 +478,7 @@ export default function App() {
 
       {/* Main Content */}
       <main className="flex-1 w-full mx-auto flex flex-col">
-        {vocab.length === 0 ? (
+        {vocab.length === 0 && activeTab !== 'dictation' ? (
            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-gray-500 dark:text-gray-400 transition-colors">
              <SearchX className="w-12 h-12 mb-4 text-gray-300 dark:text-gray-700" />
              <p>Your library is empty.</p>
@@ -599,6 +601,17 @@ export default function App() {
                   </div>
                 )}
               </div>
+            )}
+
+            {activeTab === 'dictation' && (
+              <DictationModule 
+                user={user} 
+                userVocab={vocab} 
+                onAddWord={(word) => {
+                  setEditingWord({ word, meaning: '', type: 'noun', phonetic: '', stt: Date.now() });
+                  setShowAddModal(true);
+                }}
+              />
             )}
 
             {activeTab === 'stats' && (
