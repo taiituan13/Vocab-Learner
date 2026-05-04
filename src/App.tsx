@@ -349,8 +349,10 @@ export default function App() {
         return;
       }
       if (quizMode === 'mcq' && status === 'guessing' && !e.ctrlKey) {
-         const num = parseInt(e.key);
-         if (num >= 1 && num <= 4) { e.preventDefault(); handleMcqSelection(num - 1); }
+         if (e.code === 'Digit1' || e.key === '1') { e.preventDefault(); handleMcqSelection(0); }
+         else if (e.code === 'Digit2' || e.key === '2') { e.preventDefault(); handleMcqSelection(1); }
+         else if (e.code === 'Digit3' || e.key === '3') { e.preventDefault(); handleMcqSelection(2); }
+         else if (e.code === 'Digit4' || e.key === '4') { e.preventDefault(); handleMcqSelection(3); }
       }
     };
     window.addEventListener('keydown', handleGlobalKey);
@@ -388,35 +390,35 @@ export default function App() {
     return diffChars(lastWrongTyped.toLowerCase().trim(), currentWord.word.toLowerCase().trim());
   }, [lastWrongTyped, currentWord, hasFailedWord]);
 
-  if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-gray-50"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div></div>;
+  if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950 transition-colors duration-300"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 dark:border-indigo-400"></div></div>;
   if (!user) return <Auth isLoading={isLoading} user={user} />;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col font-sans transition-colors duration-300">
       {/* Header */}
-      <header className="bg-white shadow-sm px-4 md:px-8 py-4 flex flex-col md:flex-row justify-between items-center gap-4 border-b border-gray-100 z-10 relative">
-        <div className="flex items-center gap-2 text-indigo-600">
+      <header className="bg-white dark:bg-gray-900 shadow-sm px-4 md:px-8 py-4 flex flex-col md:flex-row justify-between items-center gap-4 border-b border-gray-100 dark:border-gray-800 z-10 relative">
+        <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
           <BookOpen className="w-6 h-6" />
           <h1 className="text-xl font-bold tracking-tight">Vocab Learner</h1>
         </div>
         
-        <div className="flex bg-gray-100 p-1 rounded-xl">
-          <button onClick={() => setActiveTab('quiz')} className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all ${activeTab === 'quiz' ? 'bg-white shadow-sm text-indigo-700' : 'text-gray-500 hover:text-gray-700'}`}><Play className="w-4 h-4" /> Quiz</button>
-          <button onClick={() => setActiveTab('stats')} className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all ${activeTab === 'stats' ? 'bg-white shadow-sm text-indigo-700' : 'text-gray-500 hover:text-gray-700'}`}><BarChart2 className="w-4 h-4" /> Stats</button>
-          <button onClick={() => setActiveTab('manage')} className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all ${activeTab === 'manage' ? 'bg-white shadow-sm text-indigo-700' : 'text-gray-500 hover:text-gray-700'}`}><Library className="w-4 h-4" /> Manage</button>
+        <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
+          <button onClick={() => setActiveTab('quiz')} className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all ${activeTab === 'quiz' ? 'bg-white dark:bg-gray-700 shadow-sm text-indigo-700 dark:text-indigo-300' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}><Play className="w-4 h-4" /> Quiz</button>
+          <button onClick={() => setActiveTab('stats')} className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all ${activeTab === 'stats' ? 'bg-white dark:bg-gray-700 shadow-sm text-indigo-700 dark:text-indigo-300' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}><BarChart2 className="w-4 h-4" /> Stats</button>
+          <button onClick={() => setActiveTab('manage')} className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all ${activeTab === 'manage' ? 'bg-white dark:bg-gray-700 shadow-sm text-indigo-700 dark:text-indigo-300' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}><Library className="w-4 h-4" /> Manage</button>
         </div>
         
         <div className="flex items-center gap-4 relative">
           <button 
             onClick={() => setShowUserMenu(!showUserMenu)}
-            className="flex items-center gap-3 px-3 py-1.5 bg-white border border-gray-100 rounded-full hover:bg-gray-50 transition-all shadow-sm group"
+            className="flex items-center gap-3 px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-full hover:bg-gray-50 dark:hover:bg-gray-700 transition-all shadow-sm group"
           >
-            <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold text-xs shadow-inner">
+            <div className="w-8 h-8 bg-indigo-100 dark:bg-indigo-900/50 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-xs shadow-inner">
               {user?.displayName?.[0] || user?.email?.[0]}
             </div>
             <div className="hidden md:flex flex-col items-start leading-none">
-              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Welcome</span>
-              <span className="text-sm font-bold text-gray-700 group-hover:text-indigo-600 transition-colors">
+              <span className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-0.5">Welcome</span>
+              <span className="text-sm font-bold text-gray-700 dark:text-gray-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                 {user?.displayName || user?.email?.split('@')[0]}
               </span>
             </div>
@@ -424,22 +426,22 @@ export default function App() {
           </button>
 
           {showUserMenu && (
-            <div className="absolute right-0 top-full mt-3 w-72 bg-white rounded-3xl shadow-2xl shadow-indigo-200/50 border border-gray-50 py-4 z-50 animate-in fade-in slide-in-from-top-2">
-              <div className="px-6 py-4 border-b border-gray-50 mb-3">
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Signed in as</p>
-                <p className="text-sm font-bold text-gray-800 truncate">{user?.email}</p>
+            <div className="absolute right-0 top-full mt-3 w-72 bg-white dark:bg-gray-900 rounded-3xl shadow-2xl shadow-indigo-200/50 dark:shadow-none border border-gray-50 dark:border-gray-800 py-4 z-50 animate-in fade-in slide-in-from-top-2">
+              <div className="px-6 py-4 border-b border-gray-50 dark:border-gray-800 mb-3">
+                <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Signed in as</p>
+                <p className="text-sm font-bold text-gray-800 dark:text-gray-100 truncate">{user?.email}</p>
               </div>
 
               <div className="px-4 mb-3">
-                <div className="bg-gray-50 rounded-2xl p-4 flex justify-between items-center">
+                <div className="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-4 flex justify-between items-center">
                   <div className="text-center flex-1">
-                    <div className="text-orange-500 font-black text-lg leading-none mb-1">{streak}</div>
-                    <div className="text-[9px] font-bold text-gray-400 uppercase">Streak</div>
+                    <div className="text-orange-500 dark:text-orange-400 font-black text-lg leading-none mb-1">{streak}</div>
+                    <div className="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase">Streak</div>
                   </div>
-                  <div className="w-[1px] h-8 bg-gray-200"></div>
+                  <div className="w-[1px] h-8 bg-gray-200 dark:bg-gray-700"></div>
                   <div className="text-center flex-1">
-                    <div className="text-indigo-600 font-black text-lg leading-none mb-1">{totalMastered}</div>
-                    <div className="text-[9px] font-bold text-gray-400 uppercase">Mastered</div>
+                    <div className="text-indigo-600 dark:text-indigo-400 font-black text-lg leading-none mb-1">{totalMastered}</div>
+                    <div className="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase">Mastered</div>
                   </div>
                 </div>
               </div>
@@ -447,22 +449,22 @@ export default function App() {
               <div className="px-2 space-y-1">
                 <button 
                   onClick={() => setDarkMode(!darkMode)}
-                  className="w-full flex items-center justify-between px-4 py-3 text-sm font-bold text-gray-600 hover:bg-gray-50 rounded-xl transition-all"
+                  className="w-full flex items-center justify-between px-4 py-3 text-sm font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-all"
                 >
                   <div className="flex items-center gap-3">
                     {darkMode ? <Sun className="w-4 h-4 text-amber-500"/> : <Moon className="w-4 h-4 text-indigo-500"/>}
                     {darkMode ? 'Light Mode' : 'Dark Mode'}
                   </div>
-                  <div className={`w-10 h-5 rounded-full relative transition-colors ${darkMode ? 'bg-amber-400' : 'bg-gray-200'}`}>
+                  <div className={`w-10 h-5 rounded-full relative transition-colors ${darkMode ? 'bg-amber-400' : 'bg-gray-200 dark:bg-gray-700'}`}>
                     <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${darkMode ? 'right-1' : 'left-1'}`}></div>
                   </div>
                 </button>
 
-                <div className="h-[1px] bg-gray-50 my-2 mx-4"></div>
+                <div className="h-[1px] bg-gray-50 dark:bg-gray-800 my-2 mx-4"></div>
 
                 <button 
                   onClick={() => signOut(auth)}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-400 dark:text-gray-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-xl transition-all"
                 >
                   <LogOut className="w-4 h-4" /> Sign Out
                 </button>
@@ -475,17 +477,17 @@ export default function App() {
       {/* Main Content */}
       <main className="flex-1 w-full mx-auto flex flex-col">
         {vocab.length === 0 ? (
-           <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-gray-500">
-             <SearchX className="w-12 h-12 mb-4 text-gray-300" />
+           <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-gray-500 dark:text-gray-400 transition-colors">
+             <SearchX className="w-12 h-12 mb-4 text-gray-300 dark:text-gray-700" />
              <p>Your library is empty.</p>
-             <button onClick={() => setShowAddModal(true)} className="mt-4 bg-indigo-600 text-white px-6 py-2 rounded-xl font-bold">Add First Word</button>
+             <button onClick={() => setShowAddModal(true)} className="mt-4 bg-indigo-600 text-white px-6 py-2 rounded-xl font-bold shadow-lg shadow-indigo-100 dark:shadow-none hover:bg-indigo-700 transition-all">Add First Word</button>
            </div>
         ) : (
           <>
             {activeTab === 'quiz' && (
               <div className="max-w-3xl w-full mx-auto p-6 flex-1 flex flex-col justify-center">
                 <div className="flex justify-between items-center mb-6">
-                  <select value={selectedTag} onChange={(e) => setSelectedTag(e.target.value)} className="text-sm font-bold text-indigo-700 bg-indigo-50 border-none rounded-lg p-2">
+                  <select value={selectedTag} onChange={(e) => setSelectedTag(e.target.value)} className="text-sm font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/50 border-none rounded-lg p-2 outline-none">
                     <option value="all">All Words</option>
                     <option value="weakest">🔥 Weakest</option>
                     {allTags.map(t => <option key={t} value={t}>{t}</option>)}
@@ -493,27 +495,27 @@ export default function App() {
                 </div>
 
                 {currentWord && (
-                  <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12 text-center relative">
+                  <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-xl dark:shadow-none p-8 md:p-12 text-center relative border dark:border-gray-800 transition-colors">
                     {quizMode === 'typing' ? (
                       <>
-                        <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-8">{currentWord.meaning}</h2>
+                        <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-8">{currentWord.meaning}</h2>
                         {hasFailedWord && stringDiff && (
-                          <div className="mb-6 p-4 bg-gray-50 rounded-2xl border border-gray-100 font-mono text-xl">
+                          <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 font-mono text-xl">
                             {stringDiff.map((part, i) => (
-                              <span key={i} className={part.added ? 'text-emerald-600 bg-emerald-50' : part.removed ? 'text-rose-400 line-through opacity-50' : 'text-gray-800'}>{part.value}</span>
+                              <span key={i} className={part.added ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20' : part.removed ? 'text-rose-400 dark:text-rose-500 line-through opacity-50' : 'text-gray-800 dark:text-gray-200'}>{part.value}</span>
                             ))}
                           </div>
                         )}
-                        <input ref={inputRef} type="text" value={inputValue} onChange={(e) => setInputValue(e.target.value)} disabled={status === 'answered'} className="w-full text-center text-2xl p-4 rounded-xl border-2 border-gray-200 focus:border-indigo-500 outline-none mb-6" autoFocus />
+                        <input ref={inputRef} type="text" value={inputValue} onChange={(e) => setInputValue(e.target.value)} disabled={status === 'answered'} className="w-full text-center text-2xl p-4 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-indigo-500 dark:focus:border-indigo-400 outline-none mb-6 transition-colors" autoFocus />
                       </>
                     ) : (
                       <>
-                        <h2 className="text-4xl md:text-5xl font-extrabold text-indigo-900 mb-8 flex items-center justify-center gap-4">
-                          {currentWord.word} <button onClick={() => playAudio(currentWord.word)}><Volume2 className="w-6 h-6 text-indigo-400" /></button>
+                        <h2 className="text-4xl md:text-5xl font-extrabold text-indigo-900 dark:text-indigo-400 mb-8 flex items-center justify-center gap-4">
+                          {currentWord.word} <button onClick={() => playAudio(currentWord.word)}><Volume2 className="w-6 h-6 text-indigo-400 dark:text-indigo-500" /></button>
                         </h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                           {mcqOptions.map((opt, idx) => (
-                            <button key={idx} onClick={() => handleMcqSelection(idx)} disabled={status === 'answered'} className={`p-4 rounded-xl border-2 transition-all text-lg font-medium ${status === 'answered' ? (opt.stt === currentWord.stt ? 'border-emerald-500 bg-emerald-50' : (mcqSelected === idx ? 'border-rose-300 opacity-50' : 'border-gray-100 opacity-30')) : 'border-gray-100 hover:border-indigo-200'}`}>
+                            <button key={idx} onClick={() => handleMcqSelection(idx)} disabled={status === 'answered'} className={`p-4 rounded-xl border-2 transition-all text-lg font-medium ${status === 'answered' ? (opt.stt === currentWord.stt ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 dark:text-emerald-400' : (mcqSelected === idx ? 'border-rose-300 dark:border-rose-900/50 opacity-50' : 'border-gray-100 dark:border-gray-800 opacity-30')) : 'border-gray-100 dark:border-gray-800 dark:text-gray-300 hover:border-indigo-200 dark:hover:border-indigo-500 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/20'}`}>
                               {opt.meaning}
                             </button>
                           ))}
@@ -522,59 +524,51 @@ export default function App() {
                     )}
                     {status === 'answered' && (
                       <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        {/* Correct Answer Header for Typing Mode */}
-                        {/* {quizMode === 'typing' && !feedback?.message && (
-                          <div className="flex flex-col items-center mb-6">
-                            <span className="text-emerald-500 font-black text-6xl mb-2">✓</span>
-                            <h3 className="text-3xl font-bold text-emerald-600">{currentWord.word}</h3>
-                          </div>
-                        )} */}
-
                         {dictionaryInfo ? (
-                          <div className="bg-gray-50 rounded-3xl p-6 md:p-8 text-left border border-gray-100 shadow-inner">
+                          <div className="bg-gray-50 dark:bg-gray-800/50 rounded-3xl p-6 md:p-8 text-left border border-gray-100 dark:border-gray-700 shadow-inner">
                             <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-                              <div className="flex items-center gap-2 text-gray-400 font-mono italic">
+                              <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 font-mono italic">
                                 {dictionaryInfo.phonetic}
-                                <button onClick={() => playAudio(currentWord.word)} className="p-2 hover:bg-white rounded-full transition-colors">
-                                  <Volume2 className="w-5 h-5 text-indigo-500" />
+                                <button onClick={() => playAudio(currentWord.word)} className="p-2 hover:bg-white dark:hover:bg-gray-700 rounded-full transition-colors">
+                                  <Volume2 className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />
                                 </button>
                               </div>
                             </div>
 
                             <div className="space-y-4">
                               <div>
-                                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                                <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1.5 flex items-center gap-2">
                                   <Info className="w-3.5 h-3.5" /> Definition
                                 </p>
-                                <p className="text-gray-700 leading-relaxed font-medium">
+                                <p className="text-gray-700 dark:text-gray-200 leading-relaxed font-medium">
                                   {dictionaryInfo.definition}
                                 </p>
                               </div>
 
                               {dictionaryInfo.example && (
-                                <div className="pl-4 border-l-4 border-indigo-100">
-                                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Example</p>
-                                  <p className="text-gray-600 italic">"{dictionaryInfo.example}"</p>
+                                <div className="pl-4 border-l-4 border-indigo-100 dark:border-indigo-900">
+                                  <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Example</p>
+                                  <p className="text-gray-600 dark:text-gray-400 italic">"{dictionaryInfo.example}"</p>
                                 </div>
                               )}
 
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                                 {dictionaryInfo.synonyms && dictionaryInfo.synonyms.length > 0 && (
                                   <div>
-                                    <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-1.5">Synonyms</p>
+                                    <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-1.5">Synonyms</p>
                                     <div className="flex flex-wrap gap-1.5">
                                       {dictionaryInfo.synonyms.map(s => (
-                                        <span key={s} className="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[11px] rounded-md border border-emerald-100 font-medium">{s}</span>
+                                        <span key={s} className="px-2 py-0.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-[11px] rounded-md border border-emerald-100 dark:border-emerald-800 font-medium">{s}</span>
                                       ))}
                                     </div>
                                   </div>
                                 )}
                                 {dictionaryInfo.antonyms && dictionaryInfo.antonyms.length > 0 && (
                                   <div>
-                                    <p className="text-[10px] font-bold text-rose-600 uppercase tracking-widest mb-1.5">Antonyms</p>
+                                    <p className="text-[10px] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-widest mb-1.5">Antonyms</p>
                                     <div className="flex flex-wrap gap-1.5">
                                       {dictionaryInfo.antonyms.map(a => (
-                                        <span key={a} className="px-2 py-0.5 bg-rose-50 text-rose-700 text-[11px] rounded-md border border-rose-100 font-medium">{a}</span>
+                                        <span key={a} className="px-2 py-0.5 bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 text-[11px] rounded-md border border-rose-100 dark:border-rose-800 font-medium">{a}</span>
                                       ))}
                                     </div>
                                   </div>
@@ -583,7 +577,7 @@ export default function App() {
 
                               {dictionaryInfo.sourceUrl && (
                                 <div className="pt-2">
-                                  <a href={dictionaryInfo.sourceUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[11px] font-bold text-indigo-500 hover:text-indigo-700 transition-colors uppercase tracking-widest">
+                                  <a href={dictionaryInfo.sourceUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[11px] font-bold text-indigo-500 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors uppercase tracking-widest">
                                     Full Details <ExternalLink className="w-3 h-3" />
                                   </a>
                                 </div>
@@ -592,12 +586,12 @@ export default function App() {
                           </div>
                         ) : (
                           <div className="py-12 animate-pulse flex flex-col items-center">
-                            <div className="h-4 w-48 bg-gray-100 rounded-full mb-4"></div>
-                            <div className="h-4 w-32 bg-gray-50 rounded-full"></div>
+                            <div className="h-4 w-48 bg-gray-100 dark:bg-gray-800 rounded-full mb-4"></div>
+                            <div className="h-4 w-32 bg-gray-50 dark:bg-gray-800 rounded-full"></div>
                           </div>
                         )}
                         
-                        <button onClick={() => nextWord()} className="w-full py-4 bg-gray-900 text-white rounded-2xl font-bold uppercase tracking-widest shadow-xl shadow-gray-200 hover:bg-black hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-2">
+                        <button onClick={() => nextWord()} className="w-full py-4 bg-gray-900 dark:bg-indigo-600 text-white rounded-2xl font-bold uppercase tracking-widest shadow-xl shadow-gray-200 dark:shadow-none hover:bg-black dark:hover:bg-indigo-700 hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-2">
                           Next Word <Play className="w-4 h-4" />
                         </button>
                       </div>
@@ -610,19 +604,19 @@ export default function App() {
             {activeTab === 'stats' && (
               <div className="max-w-4xl w-full mx-auto p-6 space-y-6">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center">
-                    <div className="text-gray-400 text-sm mb-1">Streak</div>
+                  <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 text-center transition-colors">
+                    <div className="text-gray-400 dark:text-gray-500 text-sm mb-1">Streak</div>
                     <div className="text-3xl font-black text-orange-500">{streak}</div>
                   </div>
-                  <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center">
-                    <div className="text-gray-400 text-sm mb-1">Mastered</div>
-                    <div className="text-3xl font-black text-indigo-600">{totalMastered}</div>
+                  <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 text-center transition-colors">
+                    <div className="text-gray-400 dark:text-gray-500 text-sm mb-1">Mastered</div>
+                    <div className="text-3xl font-black text-indigo-600 dark:text-indigo-400">{totalMastered}</div>
                   </div>
                 </div>
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-80">
-                   <h3 className="font-bold mb-4">Activity</h3>
+                <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 h-80 transition-colors">
+                   <h3 className="font-bold mb-4 dark:text-white">Activity</h3>
                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={chartData}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="date"/><YAxis/><Tooltip/><Bar dataKey="itemsLearned" fill="#6366F1" radius={[4,4,0,0]}/></BarChart>
+                      <BarChart data={chartData}><CartesianGrid strokeDasharray="3 3" vertical={false} stroke={darkMode ? '#374151' : '#e5e7eb'}/><XAxis dataKey="date" stroke={darkMode ? '#9ca3af' : '#6b7280'}/><YAxis stroke={darkMode ? '#9ca3af' : '#6b7280'}/><Tooltip contentStyle={{ backgroundColor: darkMode ? '#111827' : '#fff', borderColor: darkMode ? '#374151' : '#e5e7eb', color: darkMode ? '#fff' : '#000' }}/><Bar dataKey="itemsLearned" fill="#6366F1" radius={[4,4,0,0]}/></BarChart>
                    </ResponsiveContainer>
                 </div>
               </div>
@@ -631,17 +625,17 @@ export default function App() {
             {activeTab === 'manage' && (
               <div className="max-w-6xl w-full mx-auto p-6">
                 <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-                  <h2 className="text-2xl font-bold text-gray-900">Vocabulary Library</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Vocabulary Library</h2>
                   <div className="flex flex-wrap gap-2 w-full md:w-auto">
                     <div className="relative flex-1 md:w-64">
                        <SearchX className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
                        <input 
                          type="text" placeholder="Search word or meaning..." 
                          value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
-                         className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                         className="w-full pl-10 pr-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-colors"
                        />
                     </div>
-                    <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                    <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500 transition-colors">
                       <option value="all">All Types</option>
                       <option value="noun">Noun</option>
                       <option value="verb">Verb</option>
@@ -649,17 +643,17 @@ export default function App() {
                     </select>
                     <button 
                       onClick={() => { setEditingWord(null); setShowAddModal(true); }} 
-                      className="bg-indigo-600 text-white px-5 py-2 rounded-xl flex items-center gap-2 font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all"
+                      className="bg-indigo-600 text-white px-5 py-2 rounded-xl flex items-center gap-2 font-bold shadow-lg shadow-indigo-100 dark:shadow-none hover:bg-indigo-700 transition-all"
                     >
                       <Plus className="w-5 h-5"/> Add Word
                     </button>
                   </div>
                 </div>
 
-                <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden transition-colors">
                   <div className="overflow-x-auto">
                     <table className="w-full text-left">
-                      <thead className="bg-gray-50 text-xs font-bold text-gray-400 uppercase tracking-widest">
+                      <thead className="bg-gray-50 dark:bg-gray-800/50 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
                         <tr>
                           <th className="p-5">Word</th>
                           <th className="p-5">Meaning</th>
@@ -668,7 +662,7 @@ export default function App() {
                           <th className="p-5 text-center">Actions</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-50">
+                      <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
                         {vocab
                           .filter(v => 
                             (v.word.toLowerCase().includes(searchTerm.toLowerCase()) || v.meaning.toLowerCase().includes(searchTerm.toLowerCase())) &&
@@ -678,21 +672,21 @@ export default function App() {
                             const stats = wordStats[v.stt] || { score: 0, attempts: 0 };
                             const isMastered = stats.score >= 5;
                             return (
-                              <tr key={v.stt} className="hover:bg-indigo-50/30 transition-colors group">
+                              <tr key={v.stt} className="hover:bg-indigo-50/30 dark:hover:bg-indigo-900/10 transition-colors group">
                                 <td className="p-5">
-                                  <div className="font-bold text-gray-900 text-lg flex items-center gap-2">
+                                  <div className="font-bold text-gray-900 dark:text-gray-100 text-lg flex items-center gap-2">
                                     {v.word}
-                                    <button onClick={() => playAudio(v.word)} className="text-gray-300 hover:text-indigo-600 transition-colors opacity-0 group-hover:opacity-100"><Volume2 className="w-4 h-4"/></button>
+                                    <button onClick={() => playAudio(v.word)} className="text-gray-300 dark:text-gray-600 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors opacity-0 group-hover:opacity-100"><Volume2 className="w-4 h-4"/></button>
                                   </div>
-                                  <div className="text-xs text-gray-400 font-mono">{v.phonetic} • {v.type}</div>
+                                  <div className="text-xs text-gray-400 dark:text-gray-500 font-mono">{v.phonetic} • {v.type}</div>
                                 </td>
-                                <td className="p-5 text-gray-600 font-medium">{v.meaning}</td>
+                                <td className="p-5 text-gray-600 dark:text-gray-400 font-medium">{v.meaning}</td>
                                 <td className="p-5">
-                                  <div className="text-sm font-bold text-indigo-600">{stats.score} pts</div>
-                                  <div className="text-[10px] text-gray-400 uppercase tracking-tighter">{stats.attempts} attempts</div>
+                                  <div className="text-sm font-bold text-indigo-600 dark:text-indigo-400">{stats.score} pts</div>
+                                  <div className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-tighter">{stats.attempts} attempts</div>
                                 </td>
                                 <td className="p-5">
-                                  <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full ${isMastered ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                                  <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full ${isMastered ? 'bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400' : 'bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400'}`}>
                                     {isMastered ? 'Mastered' : 'Learning'}
                                   </span>
                                 </td>
@@ -703,7 +697,7 @@ export default function App() {
                                         setEditingWord(v); 
                                         setShowAddModal(true); 
                                       }}
-                                      className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                                      className="p-2 text-gray-400 dark:text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
                                     >
                                       <Settings className="w-4 h-4" />
                                     </button>
@@ -714,7 +708,7 @@ export default function App() {
                                           await syncVocab(newVocab);
                                         }
                                       }}
-                                      className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+                                      className="p-2 text-gray-400 dark:text-gray-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/30 rounded-lg transition-all"
                                     >
                                       <Trash2 className="w-4 h-4" />
                                     </button>
@@ -734,20 +728,20 @@ export default function App() {
       </main>
 
       {/* Footer / Credit */}
-      <footer className="bg-white border-t border-gray-100 py-6 px-4">
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
+      <footer className="bg-white dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 py-6 px-4 transition-colors">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-indigo-600">Vocab Learner Pro</span>
+            <span className="font-bold text-indigo-600 dark:text-indigo-400">Vocab Learner Pro</span>
             <span>&copy; {new Date().getFullYear()}</span>
           </div>
           <div className="flex items-center gap-1">
             Developed with <span className="text-rose-500 text-lg">♥</span> by 
-            <a href="https://github.com/taiituan13" target="_blank" rel="noopener noreferrer" className="font-bold text-gray-800 hover:text-indigo-600 transition-colors ml-1">
+            <a href="https://github.com/taiituan13" target="_blank" rel="noopener noreferrer" className="font-bold text-gray-800 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors ml-1">
               Nguyen Tuan Tai
             </a>
           </div>
           <div className="flex gap-4">
-            <a href="https://github.com/taiituan13/Vocab-Learner" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-600">Open Source</a>
+            <a href="https://github.com/taiituan13/Vocab-Learner" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-600 dark:hover:text-indigo-400">Open Source</a>
             <span className="opacity-30">|</span>
             <span>v1.0.0</span>
           </div>

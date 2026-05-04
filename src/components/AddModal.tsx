@@ -140,18 +140,18 @@ const AddModal: React.FC<AddModalProps> = ({ isOpen, onClose, vocab, editingWord
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-        <div className="flex bg-gray-50 border-b border-gray-100">
-          <button onClick={() => setDataTab('single')} className={`flex-1 py-4 text-sm font-bold flex items-center justify-center gap-2 transition-all ${dataTab === 'single' ? 'bg-white text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-400 hover:text-gray-600'}`}>
+      <div className="bg-white dark:bg-gray-900 rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 border dark:border-gray-800 transition-colors">
+        <div className="flex bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-colors">
+          <button onClick={() => setDataTab('single')} className={`flex-1 py-4 text-sm font-bold flex items-center justify-center gap-2 transition-all ${dataTab === 'single' ? 'bg-white dark:bg-gray-900 text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}>
             <Plus className="w-4 h-4"/> {editingWord ? 'Edit Word' : 'Add Word'}
           </button>
-          <button onClick={() => setDataTab('import')} className={`flex-1 py-4 text-sm font-bold flex items-center justify-center gap-2 transition-all ${dataTab === 'import' ? 'bg-white text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-400 hover:text-gray-600'}`}>
+          <button onClick={() => setDataTab('import')} className={`flex-1 py-4 text-sm font-bold flex items-center justify-center gap-2 transition-all ${dataTab === 'import' ? 'bg-white dark:bg-gray-900 text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}>
             <Upload className="w-4 h-4"/> Import
           </button>
-          <button onClick={() => setDataTab('export')} className={`flex-1 py-4 text-sm font-bold flex items-center justify-center gap-2 transition-all ${dataTab === 'export' ? 'bg-white text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-400 hover:text-gray-600'}`}>
+          <button onClick={() => setDataTab('export')} className={`flex-1 py-4 text-sm font-bold flex items-center justify-center gap-2 transition-all ${dataTab === 'export' ? 'bg-white dark:bg-gray-900 text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}>
             <Download className="w-4 h-4"/> Export
           </button>
-          <button onClick={onClose} className="p-4 text-gray-400 hover:text-gray-600"><XCircle className="w-6 h-6"/></button>
+          <button onClick={onClose} className="p-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"><XCircle className="w-6 h-6"/></button>
         </div>
 
         <div className="p-8">
@@ -159,7 +159,7 @@ const AddModal: React.FC<AddModalProps> = ({ isOpen, onClose, vocab, editingWord
             <form onSubmit={handleAddWord} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="relative">
-                  <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1 block">English Word</label>
+                  <label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1 mb-1 block">English Word</label>
                   <div className="relative">
                     <input 
                       type="text" 
@@ -167,39 +167,39 @@ const AddModal: React.FC<AddModalProps> = ({ isOpen, onClose, vocab, editingWord
                       value={newWord.word} 
                       onChange={e => setNewWord({...newWord, word: e.target.value})} 
                       onBlur={() => !editingWord && newWord.word && fetchWordDetails(newWord.word)}
-                      className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none pr-12" 
+                      className="w-full p-3 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none pr-12 transition-colors" 
                       required 
                     />
                     <button 
                       type="button"
                       onClick={() => fetchWordDetails(newWord.word)}
                       disabled={isFetching || !newWord.word}
-                      className="absolute right-2 top-1.5 p-1.5 text-indigo-500 hover:bg-indigo-50 rounded-lg transition-all disabled:opacity-30"
+                      className="absolute right-2 top-1.5 p-1.5 text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all disabled:opacity-30"
                     >
                       {isFetching ? <RefreshCcw className="w-5 h-5 animate-spin" /> : <Lightbulb className="w-5 h-5" />}
                     </button>
                   </div>
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1 block">Meaning</label>
-                  <input type="text" placeholder="e.g. Sự hiển linh" value={newWord.meaning} onChange={e => setNewWord({...newWord, meaning: e.target.value})} className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" required />
+                  <label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1 mb-1 block">Meaning</label>
+                  <input type="text" placeholder="e.g. Sự hiển linh" value={newWord.meaning} onChange={e => setNewWord({...newWord, meaning: e.target.value})} className="w-full p-3 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-colors" required />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1 block">Type</label>
-                  <select value={newWord.type} onChange={e => setNewWord({...newWord, type: e.target.value})} className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
+                  <label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1 mb-1 block">Type</label>
+                  <select value={newWord.type} onChange={e => setNewWord({...newWord, type: e.target.value})} className="w-full p-3 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition-colors">
                     <option value="noun">Noun</option><option value="verb">Verb</option><option value="adj">Adjective</option><option value="adv">Adverb</option>
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1 block">Phonetic</label>
-                  <input disabled type="text" placeholder="/ɪˈpɪf.ə.ni/" value={newWord.phonetic} onChange={e => setNewWord({...newWord, phonetic: e.target.value})} className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500" />
+                  <label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1 mb-1 block">Phonetic</label>
+                  <input disabled type="text" placeholder="/ɪˈpɪf.ə.ni/" value={newWord.phonetic} onChange={e => setNewWord({...newWord, phonetic: e.target.value})} className="w-full p-3 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition-colors opacity-60" />
                 </div>
               </div>
               <div>
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1 block">Tags (comma separated)</label>
-                <input type="text" placeholder="academic, daily" value={newWord.tags} onChange={e => setNewWord({...newWord, tags: e.target.value})} className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500" />
+                <label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1 mb-1 block">Tags (comma separated)</label>
+                <input type="text" placeholder="academic, daily" value={newWord.tags} onChange={e => setNewWord({...newWord, tags: e.target.value})} className="w-full p-3 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition-colors" />
               </div>
-              <button type="submit" className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all uppercase tracking-widest text-sm mt-4">
+              <button type="submit" className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold shadow-lg shadow-indigo-100 dark:shadow-none hover:bg-indigo-700 transition-all uppercase tracking-widest text-sm mt-4">
                 {editingWord ? 'Update Word' : 'Save Word'}
               </button>
             </form>
@@ -207,17 +207,17 @@ const AddModal: React.FC<AddModalProps> = ({ isOpen, onClose, vocab, editingWord
 
           {dataTab === 'import' && (
             <div className="space-y-6">
-              <div className="text-sm text-gray-500 bg-indigo-50 p-4 rounded-xl flex gap-3">
-                <AlertTriangle className="w-5 h-5 text-indigo-600 flex-shrink-0" />
+              <div className="text-sm text-gray-500 dark:text-gray-400 bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-xl flex gap-3">
+                <AlertTriangle className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0" />
                 <p>Paste your <strong>JSON array</strong> or <strong>CSV text</strong> (STT, Word, Meaning, Type, Phonetic, Tags) below. All new words will be merged with your existing library.</p>
               </div>
               <textarea 
                 value={jsonInput} onChange={e => setJsonInput(e.target.value)} 
                 placeholder="[ { 'word': 'example', ... } ] OR CSV rows..."
-                className="w-full h-48 p-4 bg-gray-50 border border-gray-100 rounded-xl font-mono text-xs focus:ring-2 focus:ring-indigo-500 outline-none" 
+                className="w-full h-48 p-4 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl font-mono text-xs focus:ring-2 focus:ring-indigo-500 outline-none transition-colors" 
               />
               <div className="grid grid-cols-2 gap-4">
-                <button onClick={handleImportJson} className="py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition-all">Import as JSON</button>
+                <button onClick={handleImportJson} className="py-3 bg-gray-900 dark:bg-gray-700 text-white rounded-xl font-bold hover:bg-black dark:hover:bg-gray-600 transition-all">Import as JSON</button>
                 <button 
                   onClick={async () => {
                     const parsed = parseCSV(jsonInput);
@@ -240,10 +240,10 @@ const AddModal: React.FC<AddModalProps> = ({ isOpen, onClose, vocab, editingWord
 
           {dataTab === 'export' && (
             <div className="space-y-6 text-center">
-              <div className="p-8 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
-                <Download className="w-12 h-12 text-indigo-300 mx-auto mb-4" />
-                <h4 className="font-bold text-gray-900 mb-1">Download Library Backup</h4>
-                <p className="text-sm text-gray-500 mb-6">Choose your preferred format to save your vocabulary.</p>
+              <div className="p-8 bg-gray-50 dark:bg-gray-800 rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-700 transition-colors">
+                <Download className="w-12 h-12 text-indigo-300 dark:text-indigo-900 mx-auto mb-4" />
+                <h4 className="font-bold text-gray-900 dark:text-white mb-1">Download Library Backup</h4>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Choose your preferred format to save your vocabulary.</p>
                 <div className="grid grid-cols-2 gap-4">
                   <button 
                     onClick={() => {
@@ -251,7 +251,7 @@ const AddModal: React.FC<AddModalProps> = ({ isOpen, onClose, vocab, editingWord
                       const url = URL.createObjectURL(blob);
                       const a = document.createElement('a'); a.href = url; a.download = 'vocab_backup.json'; a.click();
                     }}
-                    className="py-3 bg-white border border-gray-200 rounded-xl font-bold text-gray-700 hover:bg-gray-50"
+                    className="py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                   >
                     Download JSON
                   </button>
@@ -262,15 +262,15 @@ const AddModal: React.FC<AddModalProps> = ({ isOpen, onClose, vocab, editingWord
                       const url = URL.createObjectURL(blob);
                       const a = document.createElement('a'); a.href = url; a.download = 'vocab_export.csv'; a.click();
                     }}
-                    className="py-3 bg-indigo-50 text-indigo-700 rounded-xl font-bold hover:bg-indigo-100"
+                    className="py-3 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-xl font-bold hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
                   >
                     Download CSV
                   </button>
                 </div>
               </div>
               <div className="text-left">
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1 block">Raw JSON Data</label>
-                <textarea readOnly value={jsonInput} className="w-full h-32 p-4 bg-gray-50 border border-gray-100 rounded-xl font-mono text-[10px] text-gray-400" />
+                <label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1 mb-1 block">Raw JSON Data</label>
+                <textarea readOnly value={jsonInput} className="w-full h-32 p-4 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl font-mono text-[10px] text-gray-400 dark:text-gray-500 transition-colors" />
               </div>
             </div>
           )}
