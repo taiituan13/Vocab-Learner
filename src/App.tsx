@@ -403,11 +403,23 @@ export default function App() {
           <h1 className="text-xl font-bold tracking-tight">Vocab Learner</h1>
         </div>
         
-        <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
-          <button onClick={() => setActiveTab('quiz')} className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all ${activeTab === 'quiz' ? 'bg-white dark:bg-gray-700 shadow-sm text-indigo-700 dark:text-indigo-300' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}><Play className="w-4 h-4" /> Quiz</button>
-          <button onClick={() => setActiveTab('dictation')} className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all ${activeTab === 'dictation' ? 'bg-white dark:bg-gray-700 shadow-sm text-indigo-700 dark:text-indigo-300' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}><Headphones className="w-4 h-4" /> Dictation</button>
-          <button onClick={() => setActiveTab('stats')} className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all ${activeTab === 'stats' ? 'bg-white dark:bg-gray-700 shadow-sm text-indigo-700 dark:text-indigo-300' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}><BarChart2 className="w-4 h-4" /> Stats</button>
-          <button onClick={() => setActiveTab('manage')} className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all ${activeTab === 'manage' ? 'bg-white dark:bg-gray-700 shadow-sm text-indigo-700 dark:text-indigo-300' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}><Library className="w-4 h-4" /> Manage</button>
+        <div className="flex items-center bg-gray-100 dark:bg-gray-800 p-1.5 rounded-2xl gap-2">
+          {/* Category: Learn */}
+          <div className="flex items-center bg-white dark:bg-gray-700/50 p-1 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+             <span className="px-2 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest hidden sm:inline border-r border-gray-100 dark:border-gray-700 mr-1">Learn</span>
+             <button onClick={() => setActiveTab('quiz')} className={`px-4 py-1.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all ${activeTab === 'quiz' ? 'bg-white dark:bg-gray-600 shadow-sm text-indigo-700 dark:text-indigo-300' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}><Play className="w-4 h-4" /> Quiz</button>
+             <button onClick={() => setActiveTab('dictation')} className={`px-4 py-1.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all ${activeTab === 'dictation' ? 'bg-white dark:bg-gray-600 shadow-sm text-indigo-700 dark:text-indigo-300' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}><Headphones className="w-4 h-4" /> Dictation</button>
+          </div>
+
+          {/* Category: Library */}
+          <div className="flex items-center p-1">
+             <button onClick={() => setActiveTab('manage')} className={`px-4 py-1.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all ${activeTab === 'manage' ? 'bg-white dark:bg-gray-700 shadow-sm text-indigo-700 dark:text-indigo-300' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}><Library className="w-4 h-4" /> Library</button>
+          </div>
+
+          {/* Category: Insights */}
+          <div className="flex items-center p-1">
+             <button onClick={() => setActiveTab('stats')} className={`px-4 py-1.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all ${activeTab === 'stats' ? 'bg-white dark:bg-gray-700 shadow-sm text-indigo-700 dark:text-indigo-300' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}><BarChart2 className="w-4 h-4" /> Stats</button>
+          </div>
         </div>
         
         <div className="flex items-center gap-4 relative">
@@ -748,7 +760,8 @@ export default function App() {
             <span>&copy; {new Date().getFullYear()}</span>
           </div>
           <div className="flex items-center gap-1">
-            Developed with <span className="text-rose-500 text-lg">♥</span> by 
+            Developed by 
+            {/* with <span className="text-rose-500 text-lg">♥</span>  */}
             <a href="https://github.com/taiituan13" target="_blank" rel="noopener noreferrer" className="font-bold text-gray-800 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors ml-1">
               Nguyen Tuan Tai
             </a>
@@ -756,7 +769,7 @@ export default function App() {
           <div className="flex gap-4">
             <a href="https://github.com/taiituan13/Vocab-Learner" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-600 dark:hover:text-indigo-400">Open Source</a>
             <span className="opacity-30">|</span>
-            <span>v1.0.0</span>
+            <span>v1.1.0</span>
           </div>
         </div>
       </footer>
